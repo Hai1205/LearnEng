@@ -13,7 +13,7 @@ export async function PUT(
         }
 
         const body = await request.json();
-        const { topic, vol, transcription, audioUrl, ex } = body;
+        const { topic, word, meaning, ipa, audioUrl, ex } = body;
 
         const db = await getDb();
         const result = await db.collection("flashcards").findOneAndUpdate(
@@ -21,8 +21,9 @@ export async function PUT(
             {
                 $set: {
                     ...(topic !== undefined && { topic }),
-                    ...(vol !== undefined && { vol }),
-                    ...(transcription !== undefined && { transcription }),
+                    ...(word !== undefined && { word }),
+                    ...(meaning !== undefined && { meaning }),
+                    ...(ipa !== undefined && { ipa }),
                     ...(audioUrl !== undefined && { audioUrl }),
                     ...(ex !== undefined && { ex }),
                     updatedAt: new Date(),
@@ -41,8 +42,9 @@ export async function PUT(
         const card: IFlashCard = {
             id: result._id.toString(),
             topic: result.topic ?? "",
-            vol: result.vol ?? "",
-            transcription: result.transcription ?? "",
+            word: result.word ?? "",
+            meaning: result.meaning ?? "",
+            ipa: result.ipa ?? "",
             audioUrl: result.audioUrl ?? "",
             ex: result.ex ?? "",
         };
@@ -79,8 +81,8 @@ export async function DELETE(
             );
         }
 
-        // Also clean up any vocabulary progress for this card
-        await db.collection("vocabulary_progress").deleteMany({ flashCardId: id });
+        // Also clean up any Word progress for this card
+        await db.collection("Word_progress").deleteMany({ flashCardId: id });
 
         return NextResponse.json({ data: { success: true } });
     } catch (error) {

@@ -60,8 +60,8 @@ export default function AdminDashboardClient() {
         />
 
         <StatsCard
-          title="Total Vocabulary"
-          value={stats.totalVocabulary}
+          title="Total Word"
+          value={stats.totalWord}
           subtitle="Tổng số từ vựng"
           icon={<BookOpen className="h-4 w-4" />}
           gradient="bg-linear-to-br from-blue-500 to-blue-600 shadow-blue-500/30 hover:shadow-blue-500/40"
@@ -69,7 +69,7 @@ export default function AdminDashboardClient() {
 
         <StatsCard
           title="Memorized"
-          value={stats.memorizedVocabulary}
+          value={stats.memorizedWord}
           subtitle="Từ vựng đã thuộc"
           icon={<BookCheck className="h-4 w-4" />}
           gradient="bg-linear-to-br from-emerald-500 to-emerald-600 shadow-emerald-500/30 hover:shadow-emerald-500/40"
@@ -77,7 +77,7 @@ export default function AdminDashboardClient() {
 
         <StatsCard
           title="Not Memorized"
-          value={stats.unmemorizedVocabulary}
+          value={stats.unmemorizedWord}
           subtitle="Từ vựng chưa thuộc"
           icon={<BookX className="h-4 w-4" />}
           gradient="bg-linear-to-br from-purple-500 to-purple-600 shadow-purple-500/30 hover:shadow-purple-500/40"

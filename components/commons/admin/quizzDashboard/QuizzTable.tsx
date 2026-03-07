@@ -12,6 +12,19 @@ interface QuizzTableProps {
   showPagination?: boolean;
 }
 
+const getLevelColor = (level: string) => {
+  switch (level) {
+    case "Dễ":
+      return "bg-green-500";
+    case "Trung bình":
+      return "bg-yellow-500";
+    case "Khó":
+      return "bg-red-500";
+    default:
+      return "bg-gray-500";
+  }
+};
+
 export const QuizzTable = ({
   cards,
   isLoading,
@@ -35,7 +48,7 @@ export const QuizzTable = ({
       header: "Category",
       accessor: (card: IQuizz) => (
         <div className="inline-flex items-center justify-center gap-2">
-          <span className="capitalize">{card.cat}</span>
+          <span className="capitalize">{card.category}</span>
         </div>
       ),
     },
@@ -51,7 +64,10 @@ export const QuizzTable = ({
       header: "Level",
       accessor: (card: IQuizz) => (
         <div className="inline-flex items-center justify-center gap-2">
-          <span className="capitalize">{card.lvl}</span>
+          <span
+            className={`h-2 w-2 rounded-full ${getLevelColor(card.level)}`}
+          />
+          <span className="capitalize">{card.level}</span>
         </div>
       ),
     },
@@ -59,7 +75,7 @@ export const QuizzTable = ({
       header: "Question",
       accessor: (card: IQuizz) => (
         <div className="inline-flex items-center justify-center gap-2">
-          <span className="capitalize">{card.q}</span>
+          <span className="capitalize">{card.question}</span>
         </div>
       ),
     },
@@ -67,7 +83,7 @@ export const QuizzTable = ({
       header: "Answer",
       accessor: (card: IQuizz) => (
         <div className="inline-flex items-center justify-center gap-2">
-          <span className="capitalize">{card.opts[card.ans]}</span>
+          <span className="capitalize">{card.options[card.answer]}</span>
         </div>
       ),
     },

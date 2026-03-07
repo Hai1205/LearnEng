@@ -4,8 +4,8 @@ import * as XLSX from "xlsx";
 
 export const dynamic = "force-dynamic";
 
-const REQUIRED_COLUMNS = ["cat", "topic", "q", "opt1"];
-const OPTIONAL_COLUMNS = ["lvl", "opt2", "opt3", "opt4", "ans"];
+const REQUIRED_COLUMNS = ["category", "topic", "question", "opt1"];
+const OPTIONAL_COLUMNS = ["level", "opt2", "opt3", "opt4", "answer"];
 
 export async function POST(request: NextRequest) {
     try {
@@ -68,12 +68,12 @@ export async function POST(request: NextRequest) {
         // Parse and validate rows
         const errors: string[] = [];
         const validDocs: {
-            cat: string;
+            category: string;
             topic: string;
-            lvl: string;
-            q: string;
-            opts: string[];
-            ans: number;
+            level: string;
+            question: string;
+            options: string[];
+            answer: number;
             createdAt: Date;
             updatedAt: Date;
         }[] = [];
@@ -82,42 +82,42 @@ export async function POST(request: NextRequest) {
             const row = rows[i];
             const rowNum = i + 2;
 
-            const cat = String(row.cat ?? "").trim();
+            const category = String(row.category ?? "").trim();
             const topic = String(row.topic ?? "").trim();
-            const q = String(row.q ?? "").trim();
+            const question = String(row.question ?? "").trim();
 
-            if (!cat || !topic || !q) {
+            if (!category || !topic || !question) {
                 errors.push(
-                    `Row ${rowNum}: missing required fields (cat, topic, q)`
+                    `Row ${rowNum}: missing required fields (category, topic, question)`
                 );
                 continue;
             }
 
             // Collect options from opt1, opt2, opt3, opt4
-            const opts: string[] = [];
+            const options: string[] = [];
             for (let j = 1; j <= 4; j++) {
                 const optVal = String(row[`opt${j}`] ?? "").trim();
-                if (optVal) opts.push(optVal);
+                if (optVal) options.push(optVal);
             }
 
-            if (opts.length === 0) {
+            if (options.length === 0) {
                 errors.push(`Row ${rowNum}: at least one option (opt1) is required`);
                 continue;
             }
 
-            const ansRaw = Number(row.ans);
-            const ans =
-                !isNaN(ansRaw) && ansRaw >= 0 && ansRaw < opts.length
+            const ansRaw = Number(row.answer);
+            const answer =
+                !isNaN(ansRaw) && ansRaw >= 0 && ansRaw < options.length
                     ? ansRaw
                     : 0;
 
             validDocs.push({
-                cat,
+                category,
                 topic,
-                lvl: String(row.lvl ?? "").trim(),
-                q,
-                opts,
-                ans,
+                level: String(row.level ?? "").trim(),
+                question,
+                options,
+                answer,
                 createdAt: new Date(),
                 updatedAt: new Date(),
             });
@@ -138,12 +138,12 @@ export async function POST(request: NextRequest) {
 
         const cards: IQuizz[] = validDocs.map((doc, idx) => ({
             id: result.insertedIds[idx].toString(),
-            cat: doc.cat,
+            category: doc.category,
             topic: doc.topic,
-            lvl: doc.lvl,
-            q: doc.q,
-            opts: doc.opts,
-            ans: doc.ans,
+            level: doc.level,
+            question: doc.question,
+            options: doc.options,
+            answer: doc.answer,
         }));
 
         return NextResponse.json(

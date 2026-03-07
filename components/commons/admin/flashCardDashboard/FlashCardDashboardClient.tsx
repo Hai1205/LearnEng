@@ -10,7 +10,7 @@ import { CreateFlashCardDialog } from "./CreateFlashCardDialog";
 import { UpdateFlashCardDialog } from "./UpdateFlashCardDialog";
 import { TableSearch } from "../adminTable/TableSearch";
 import { ConfirmationDialog } from "../../layout/ConfirmationDialog";
-import { FlashCardTablee } from "./FlashCardTable";
+import { FlashCardTable } from "./FlashCardTable";
 import { FlashCardFilter } from "./FlashCardFilter";
 import { ImportExcelDialog } from "../layout/dialog/ImportExcelDialog";
 import { DraggingOnPage } from "../../layout/Dragging/DraggingOnPage";
@@ -95,7 +95,8 @@ export default function FlashCardDashboardClient() {
       const searchTerms = searchQuery.toLowerCase().trim();
       results = results.filter(
         (card) =>
-          card.vol.toLowerCase().includes(searchTerms) ||
+          card.word.toLowerCase().includes(searchTerms) ||
+          card.meaning.toLowerCase().includes(searchTerms) ||
           card.topic.toLowerCase().includes(searchTerms),
       );
     }
@@ -164,10 +165,10 @@ export default function FlashCardDashboardClient() {
   const defaultFlashCard: IFlashCard = {
     id: "",
     topic: "",
-    vol: "",
-    transcription: "",
-    audioUrl: "",
-    ex: "",
+    word: "",
+    meaning: "",
+    ipa: "",
+    example: "",
   };
 
   const handleChange = (
@@ -394,7 +395,7 @@ export default function FlashCardDashboardClient() {
             </div>
           </CardHeader>
 
-          <FlashCardTablee
+          <FlashCardTable
             cards={paginatedFlashCards}
             isLoading={false}
             onUpdate={onUpdate}
@@ -425,7 +426,6 @@ export default function FlashCardDashboardClient() {
         }}
         onImport={handleImport}
         title="Import Flash Cards"
-        description="Upload file Excel với các cột: cat, topic, vol (bắt buộc), transcription, audioUrl, ex (tùy chọn)."
         isLoading={isImporting}
         externalFile={droppedFile}
       />

@@ -1,4 +1,8 @@
+"use client";
+
+import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const LEVEL_CONFIG: Record<
   string,
@@ -11,7 +15,7 @@ const LEVEL_CONFIG: Record<
 
 interface QuizzSettings {
   level: string;
-  cat: string;
+  category: string;
   topic: string;
   count: number;
   shuffle: boolean;
@@ -45,9 +49,6 @@ export default function QuizzHomeScreen({
           <h1 className="text-[26px] font-bold m-0 mb-1.5 bg-linear-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent tracking-tight">
             Quizz
           </h1>
-          <p className="text-white/45 m-0 text-[13px] tracking-wider">
-            {totalQuestions} CÂU • ĐỘNG TỪ KÉP TIẾNG ANH
-          </p>
         </div>
 
         {isLoading ? (
@@ -84,26 +85,15 @@ export default function QuizzHomeScreen({
               <label className="text-[11px] text-white/40 uppercase tracking-[1.5px] block mb-2.5">
                 Danh mục
               </label>
-              <select
-                value={settings.cat}
-                onChange={(e) =>
-                  setSettings((s) => ({
-                    ...s,
-                    cat: e.target.value,
-                    topic: "all",
-                  }))
+              <CustomSelect
+                value={settings.category}
+                onChange={(v) =>
+                  setSettings((s) => ({ ...s, category: v, topic: "all" }))
                 }
-                className="w-full py-2.5 px-3.5 rounded-[10px] border-[1.5px] border-white/12 bg-white/6 text-white text-[13px] outline-none cursor-pointer font-inherit"
-              >
-                <option value="all" className="bg-[#161b22]">
-                  📋 Tất cả danh mục
-                </option>
-                {categories.map((c) => (
-                  <option key={c} value={c} className="bg-[#161b22]">
-                    {c}
-                  </option>
-                ))}
-              </select>
+                options={categories.map((c) => ({ value: c, label: c }))}
+                placeholder="📋 Tất cả danh mục"
+                allValue="all"
+              />
             </div>
 
             {/* Topic */}
@@ -111,30 +101,18 @@ export default function QuizzHomeScreen({
               <label className="text-[11px] text-white/40 uppercase tracking-[1.5px] block mb-2.5">
                 Chủ đề
               </label>
-              <select
+              <CustomSelect
                 value={settings.topic}
-                onChange={(e) =>
-                  setSettings((s) => ({ ...s, topic: e.target.value }))
-                }
-                disabled={settings.cat === "all"}
-                className={cn(
-                  "w-full py-2.5 px-3.5 rounded-[10px] border-[1.5px] border-white/12 bg-white/6 text-[13px] outline-none font-inherit transition-opacity",
-                  settings.cat === "all"
-                    ? "opacity-40 cursor-not-allowed text-white/40"
-                    : "cursor-pointer text-white",
-                )}
-              >
-                <option value="all" className="bg-[#161b22]">
-                  {settings.cat === "all"
+                onChange={(v) => setSettings((s) => ({ ...s, topic: v }))}
+                options={topics.map((t) => ({ value: t, label: t }))}
+                placeholder={
+                  settings.category === "all"
                     ? "— Chọn danh mục trước —"
-                    : "📋 Tất cả chủ đề"}
-                </option>
-                {topics.map((t) => (
-                  <option key={t} value={t} className="bg-[#161b22]">
-                    {t}
-                  </option>
-                ))}
-              </select>
+                    : "📋 Tất cả chủ đề"
+                }
+                allValue="all"
+                disabled={settings.category === "all"}
+              />
             </div>
 
             {/* Count */}
@@ -195,6 +173,111 @@ export default function QuizzHomeScreen({
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function CustomSelect({
+  value,
+  onChange,
+  options,
+  placeholder,
+  allValue,
+  disabled,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+  placeholder: string;
+  allValue: string;
+  disabled?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node))
+        setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const selectedLabel =
+    value === allValue
+      ? placeholder
+      : (options.find((o) => o.value === value)?.label ?? placeholder);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => !disabled && setOpen((o) => !o)}
+        className={cn(
+          "w-full flex items-center justify-between py-2.5 px-3.5 rounded-[10px] border-[1.5px] border-white/12 bg-white/6 text-[13px] outline-none transition-all",
+          disabled
+            ? "opacity-40 cursor-not-allowed text-white/40"
+            : "cursor-pointer text-white hover:border-white/25",
+        )}
+      >
+        <span className="truncate">{selectedLabel}</span>
+        <svg
+          className={cn(
+            "w-2.5 h-1.5 shrink-0 ml-2 transition-transform duration-200",
+            open && !disabled && "rotate-180",
+          )}
+          viewBox="0 0 10 6"
+          fill="none"
+        >
+          <path
+            d="M1 1l4 4 4-4"
+            stroke="rgba(255,255,255,.4)"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+        </svg>
+      </button>
+
+      {open && !disabled && (
+        <div className="absolute z-50 mt-1 w-full bg-[#161b22] border border-white/14 rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.5)] overflow-hidden">
+          <ScrollArea className="h-44">
+            <button
+              type="button"
+              onClick={() => {
+                onChange(allValue);
+                setOpen(false);
+              }}
+              className={cn(
+                "w-full text-left px-3.5 py-2 text-[13px] transition-colors",
+                value === allValue
+                  ? "bg-sky-400/20 text-sky-300"
+                  : "text-white/70 hover:bg-white/8",
+              )}
+            >
+              {placeholder}
+            </button>
+            {options.map((o) => (
+              <button
+                key={o.value}
+                type="button"
+                onClick={() => {
+                  onChange(o.value);
+                  setOpen(false);
+                }}
+                className={cn(
+                  "w-full text-left px-3.5 py-2 text-[13px] transition-colors",
+                  value === o.value
+                    ? "bg-sky-400/20 text-sky-300"
+                    : "text-white/70 hover:bg-white/8",
+                )}
+              >
+                {o.label}
+              </button>
+            ))}
+          </ScrollArea>
+        </div>
+      )}
     </div>
   );
 }

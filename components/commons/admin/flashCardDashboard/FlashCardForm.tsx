@@ -31,42 +31,56 @@ export const FlashCardForm = ({ data, onChange }: FlashCardFormProps) => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="form-vol" className="text-sm font-medium">
-          Volcabulary
+        <Label htmlFor="form-word" className="text-sm font-medium">
+          Word
         </Label>
         <Input
-          id="form-vol"
+          id="form-word"
           type="text"
-          value={data?.vol || ""}
-          onChange={(e) => onChange("vol", e.target.value)}
+          value={data?.word || ""}
+          onChange={(e) => onChange("word", e.target.value)}
           className="bg-background/50 border-border/50 focus:border-primary transition-colors"
-          placeholder="Enter Volcabulary"
+          placeholder="Enter Word"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="form-transcription" className="text-sm font-medium">
-          Transcription
+        <Label htmlFor="form-meaning" className="text-sm font-medium">
+          Meaning
         </Label>
         <Input
-          id="form-transcription"
+          id="form-meaning"
           type="text"
-          value={data?.transcription || ""}
-          onChange={(e) => onChange("transcription", e.target.value)}
+          value={data?.meaning || ""}
+          onChange={(e) => onChange("meaning", e.target.value)}
           className="bg-background/50 border-border/50 focus:border-primary transition-colors"
-          placeholder="Enter Transcription"
+          placeholder="Enter Meaning"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="form-ex" className="text-sm font-medium">
+        <Label htmlFor="form-ipa" className="text-sm font-medium">
+          IPA
+        </Label>
+        <Input
+          id="form-ipa"
+          type="text"
+          value={data?.ipa || ""}
+          onChange={(e) => onChange("ipa", e.target.value)}
+          className="bg-background/50 border-border/50 focus:border-primary transition-colors"
+          placeholder="Enter ipa"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="form-example" className="text-sm font-medium">
           Example
         </Label>
         <Input
-          id="form-ex"
+          id="form-example"
           type="text"
-          value={data?.ex || ""}
-          onChange={(e) => onChange("ex", e.target.value)}
+          value={data?.example || ""}
+          onChange={(e) => onChange("example", e.target.value)}
           className="bg-background/50 border-border/50 focus:border-primary transition-colors"
           placeholder="Enter Example"
         />

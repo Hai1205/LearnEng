@@ -12,7 +12,7 @@ interface AnswerRecord {
   qid: string;
   correct: boolean;
   chosen: number;
-  ans: number;
+  answer: number;
 }
 
 interface QuizzResultScreenProps {
@@ -60,9 +60,9 @@ export default function QuizzResultScreen({
   };
   answers.forEach((a, i) => {
     const q = pool[i];
-    if (byLevel[q.lvl]) {
-      byLevel[q.lvl].t++;
-      if (a.correct) byLevel[q.lvl].c++;
+    if (byLevel[q.level]) {
+      byLevel[q.level].t++;
+      if (a.correct) byLevel[q.level].c++;
     }
   });
 
@@ -70,9 +70,9 @@ export default function QuizzResultScreen({
   const byCat: Record<string, { c: number; t: number }> = {};
   answers.forEach((a, i) => {
     const q = pool[i];
-    if (!byCat[q.cat]) byCat[q.cat] = { c: 0, t: 0 };
-    byCat[q.cat].t++;
-    if (a.correct) byCat[q.cat].c++;
+    if (!byCat[q.category]) byCat[q.category] = { c: 0, t: 0 };
+    byCat[q.category].t++;
+    if (a.correct) byCat[q.category].c++;
   });
 
   const wrongAnswers = answers.filter((a) => !a.correct);
@@ -150,14 +150,17 @@ export default function QuizzResultScreen({
             Theo động từ
           </h3>
           <div className="grid grid-cols-2 gap-2">
-            {Object.entries(byCat).map(([cat, d]) => {
+            {Object.entries(byCat).map(([category, d]) => {
               const p = Math.round((d.c / d.t) * 100);
               const col = p >= 80 ? "#10b981" : p >= 60 ? "#f59e0b" : "#ef4444";
               return (
-                <div key={cat} className="bg-white/3 rounded-lg py-2 px-2.5">
+                <div
+                  key={category}
+                  className="bg-white/3 rounded-lg py-2 px-2.5"
+                >
                   <div className="flex justify-between mb-1">
                     <span className="text-white/60 text-xs font-bold">
-                      {cat}
+                      {category}
                     </span>
                     <span className="text-xs font-bold" style={{ color: col }}>
                       {p}%
@@ -200,16 +203,16 @@ export default function QuizzResultScreen({
                   >
                     <p className="text-white/75 m-0 mb-2 text-[13px] leading-relaxed">
                       <span className="text-red-500/80 font-bold">
-                        #{q.id.slice(-6)} [{q.cat}]
+                        #{q.id.slice(-6)} [{q.category}]
                       </span>{" "}
-                      {q.q}
+                      {q.question}
                     </p>
                     <div className="flex gap-2 flex-wrap">
                       <span className="bg-red-500/15 text-red-500 py-0.5 px-2 rounded-md text-[11px]">
-                        Bạn: {LABELS[a.chosen]} – {q.opts[a.chosen]}
+                        Bạn: {LABELS[a.chosen]} – {q.options[a.chosen]}
                       </span>
                       <span className="bg-emerald-500/15 text-emerald-500 py-0.5 px-2 rounded-md text-[11px]">
-                        Đúng: {LABELS[a.ans]} – {q.opts[a.ans]}
+                        Đúng: {LABELS[a.answer]} – {q.options[a.answer]}
                       </span>
                     </div>
                   </div>

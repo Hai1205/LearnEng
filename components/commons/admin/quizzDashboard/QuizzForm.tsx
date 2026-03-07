@@ -14,12 +14,12 @@ interface QuizzFormProps {
 }
 
 export const QuizzForm = ({ data, onChange }: QuizzFormProps) => {
-  const [opts, setOpts] = useState<string[]>([]);
+  const [options, setOpts] = useState<string[]>([]);
   const [requirementInput, addOptsInput] = useState<string>("");
 
   useEffect(() => {
-    setOpts(parseField(data?.opts));
-  }, [data?.opts]);
+    setOpts(parseField(data?.options));
+  }, [data?.options]);
 
   const parseField = (field: string | string[] | undefined): string[] => {
     if (!field) return [];
@@ -39,17 +39,17 @@ export const QuizzForm = ({ data, onChange }: QuizzFormProps) => {
 
   const addOpts = () => {
     const v = requirementInput.trim();
-    if (!v || opts.length >= 4) return;
-    const next = [...opts, v];
+    if (!v || options.length >= 4) return;
+    const next = [...options, v];
     setOpts(next);
-    onChange("opts", next);
+    onChange("options", next);
     addOptsInput("");
   };
 
   const removeOpts = (index: number) => {
-    const next = opts.filter((_, i) => i !== index);
+    const next = options.filter((_, i) => i !== index);
     setOpts(next);
-    onChange("opts", next);
+    onChange("options", next);
   };
 
   const handleReqKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -62,15 +62,15 @@ export const QuizzForm = ({ data, onChange }: QuizzFormProps) => {
   return (
     <div className="space-y-6 pr-2">
       <div className="space-y-2">
-        <Label htmlFor="form-cat" className="text-sm font-medium">
+        <Label htmlFor="form-category" className="text-sm font-medium">
           Category <span className="text-destructive">*</span>
         </Label>
         <Input
-          id="form-cat"
-          value={data?.cat || ""}
-          onChange={(e) => onChange("cat", e.target.value)}
+          id="form-category"
+          value={data?.category || ""}
+          onChange={(e) => onChange("category", e.target.value)}
           className="bg-background/50 border-border/50 focus:border-primary transition-colors"
-          placeholder="Enter cat"
+          placeholder="Enter category"
           required
         />
       </div>
@@ -91,14 +91,14 @@ export const QuizzForm = ({ data, onChange }: QuizzFormProps) => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="form-lvl" className="text-sm font-medium">
+        <Label htmlFor="form-level" className="text-sm font-medium">
           Level
         </Label>
         <Input
-          id="form-lvl"
+          id="form-level"
           type="text"
-          value={data?.lvl || ""}
-          onChange={(e) => onChange("lvl", e.target.value)}
+          value={data?.level || ""}
+          onChange={(e) => onChange("level", e.target.value)}
           className="bg-background/50 border-border/50 focus:border-primary transition-colors"
           placeholder="Enter Level"
         />
@@ -106,33 +106,33 @@ export const QuizzForm = ({ data, onChange }: QuizzFormProps) => {
 
       <div className="flex gap-4">
         <div className="flex-1 space-y-2">
-          <Label htmlFor="form-q" className="text-sm font-medium">
+          <Label htmlFor="form-question" className="text-sm font-medium">
             Question
           </Label>
           <Input
-            id="form-q"
+            id="form-question"
             type="text"
-            value={data?.q || ""}
-            onChange={(e) => onChange("q", e.target.value)}
+            value={data?.question || ""}
+            onChange={(e) => onChange("question", e.target.value)}
             className="bg-background/50 border-border/50 focus:border-primary transition-colors"
             placeholder="Enter Question"
           />
         </div>
 
         <div className="w-1/5 space-y-2">
-          <Label htmlFor="form-ans" className="text-sm font-medium">
+          <Label htmlFor="form-answer" className="text-sm font-medium">
             Answer
           </Label>
           <Input
-            id="form-ans"
+            id="form-answer"
             type="number"
             min={0}
             max={3}
-            value={data?.ans ?? ""}
+            value={data?.answer ?? ""}
             onChange={(e) => {
               const v = parseInt(e.target.value);
-              if (e.target.value === "") onChange("ans", "");
-              else if (!isNaN(v) && v >= 0 && v <= 3) onChange("ans", v);
+              if (e.target.value === "") onChange("answer", "");
+              else if (!isNaN(v) && v >= 0 && v <= 3) onChange("answer", v);
             }}
             className="bg-background/50 border-border/50 focus:border-primary transition-colors"
             placeholder="0 - 3"
@@ -141,35 +141,35 @@ export const QuizzForm = ({ data, onChange }: QuizzFormProps) => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="form-opts" className="text-sm font-medium">
+        <Label htmlFor="form-options" className="text-sm font-medium">
           Options
         </Label>
         <div className="flex gap-2">
           <Input
-            id="form-opts"
+            id="form-options"
             value={requirementInput}
             onChange={(e) => addOptsInput(e.target.value)}
             onKeyDown={handleReqKey}
             placeholder={
-              opts.length >= 4
+              options.length >= 4
                 ? "Đã đạt tối đa 4 lựa chọn"
                 : "Nhập tùy chọn và nhấn Enter hoặc nhấn Thêm"
             }
-            disabled={opts.length >= 4}
+            disabled={options.length >= 4}
             className="h-10"
           />
           <Button
             onClick={addOpts}
             size="sm"
-            disabled={opts.length >= 4}
+            disabled={options.length >= 4}
             className="bg-primary text-primary-foreground shadow-md hover:shadow-lg transform hover:-translate-y-px transition-all"
           >
             <Plus className="h-4 w-4" />
           </Button>
         </div>
-        {opts.length > 0 ? (
+        {options.length > 0 ? (
           <div className="flex flex-wrap gap-2 mt-2">
-            {opts.map((req, index) => (
+            {options.map((req, index) => (
               <Badge
                 key={index}
                 variant="secondary"

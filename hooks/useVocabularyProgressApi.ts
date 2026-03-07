@@ -1,48 +1,48 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-const VOCAB_PROGRESS_KEY = ["vocabulary-progress"];
+const VOCAB_PROGRESS_KEY = ["Word-progress"];
 
-async function fetchVocabularyProgress(): Promise<{
-    data: { progress: IVocabularyProgress[] };
+async function fetchWordProgress(): Promise<{
+    data: { progress: IWordProgress[] };
 }> {
     const res = await fetch("/api/vocabulary-progress");
-    if (!res.ok) throw new Error("Failed to fetch vocabulary progress");
+    if (!res.ok) throw new Error("Failed to fetch Word progress");
     return res.json();
 }
 
-async function updateVocabularyProgress(data: {
+async function updateWordProgress(data: {
     flashCardId: string;
     isMemorized: boolean;
-}): Promise<{ data: { progress: IVocabularyProgress } }> {
+}): Promise<{ data: { progress: IWordProgress } }> {
     const res = await fetch("/api/vocabulary-progress", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
     });
-    if (!res.ok) throw new Error("Failed to update vocabulary progress");
+    if (!res.ok) throw new Error("Failed to update Word progress");
     return res.json();
 }
 
-export function useVocabularyProgressQuery() {
+export function useWordProgressQuery() {
     return useQuery({
         queryKey: VOCAB_PROGRESS_KEY,
-        queryFn: fetchVocabularyProgress,
+        queryFn: fetchWordProgress,
         staleTime: 60 * 1000,
     });
 }
 
-export function useUpdateVocabularyProgressMutation() {
+export function useUpdateWordProgressMutation() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: updateVocabularyProgress,
+        mutationFn: updateWordProgress,
         onMutate: async (variables) => {
             await queryClient.cancelQueries({ queryKey: VOCAB_PROGRESS_KEY });
             const previous = queryClient.getQueryData<{
-                data: { progress: IVocabularyProgress[] };
+                data: { progress: IWordProgress[] };
             }>(VOCAB_PROGRESS_KEY);
 
             queryClient.setQueryData<{
-                data: { progress: IVocabularyProgress[] };
+                data: { progress: IWordProgress[] };
             }>(VOCAB_PROGRESS_KEY, (old) => {
                 if (!old) return old;
                 const existing = old.data.progress.find(
@@ -66,7 +66,7 @@ export function useUpdateVocabularyProgressMutation() {
                             {
                                 flashCardId: variables.flashCardId,
                                 isMemorized: variables.isMemorized,
-                            } as IVocabularyProgress,
+                            } as IWordProgress,
                         ],
                     },
                 };

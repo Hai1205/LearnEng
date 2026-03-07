@@ -7,7 +7,7 @@ export async function GET() {
     try {
         const db = await getDb();
 
-        const [totalQuestions, totalVocabulary, quizzResults, vocabProgress] =
+        const [totalQuestions, totalWord, quizzResults, vocabProgress] =
             await Promise.all([
                 db.collection("quizzes").countDocuments(),
                 db.collection("flashcards").countDocuments(),
@@ -24,7 +24,7 @@ export async function GET() {
                     ])
                     .toArray(),
                 db
-                    .collection("vocabulary_progress")
+                    .collection("Word_progress")
                     .aggregate([
                         {
                             $group: {
@@ -44,9 +44,9 @@ export async function GET() {
             totalQuestions,
             correctAnswers: resultStats.correct,
             wrongAnswers: resultStats.wrong,
-            totalVocabulary,
-            memorizedVocabulary: vocabStats.memorized,
-            unmemorizedVocabulary: vocabStats.unmemorized,
+            totalWord,
+            memorizedWord: vocabStats.memorized,
+            unmemorizedWord: vocabStats.unmemorized,
         };
 
         return NextResponse.json({ data: { stats } });

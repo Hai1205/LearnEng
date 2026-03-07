@@ -6,9 +6,9 @@ export const dynamic = "force-dynamic";
 export async function GET() {
     try {
         const db = await getDb();
-        const docs = await db.collection("vocabulary_progress").find({}).toArray();
+        const docs = await db.collection("Word_progress").find({}).toArray();
 
-        const progress: IVocabularyProgress[] = docs.map((doc) => ({
+        const progress: IWordProgress[] = docs.map((doc) => ({
             id: doc._id.toString(),
             flashCardId: doc.flashCardId ?? "",
             isMemorized: doc.isMemorized ?? false,
@@ -17,9 +17,9 @@ export async function GET() {
 
         return NextResponse.json({ data: { progress } });
     } catch (error) {
-        console.error("GET /api/vocabulary-progress error:", error);
+        console.error("GET /api/Word-progress error:", error);
         return NextResponse.json(
-            { error: "Failed to fetch vocabulary progress" },
+            { error: "Failed to fetch Word progress" },
             { status: 500 }
         );
     }
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
         const db = await getDb();
 
         // Upsert: update if exists, insert if not
-        const result = await db.collection("vocabulary_progress").findOneAndUpdate(
+        const result = await db.collection("Word_progress").findOneAndUpdate(
             { flashCardId },
             {
                 $set: {
@@ -70,9 +70,9 @@ export async function POST(request: NextRequest) {
             },
         });
     } catch (error) {
-        console.error("POST /api/vocabulary-progress error:", error);
+        console.error("POST /api/Word-progress error:", error);
         return NextResponse.json(
-            { error: "Failed to update vocabulary progress" },
+            { error: "Failed to update Word progress" },
             { status: 500 }
         );
     }

@@ -1,6 +1,10 @@
 "use client";
 
-import { buildOptionFilter, IOptionFilter, SharedFilter } from "../adminTable/SharedFilter";
+import {
+  buildOptionFilter,
+  IOptionFilter,
+  SharedFilter,
+} from "../adminTable/SharedFilter";
 import { IQuizzFilter, QuizzFilterType } from "./QuizzDashboardClient";
 
 interface QuizzFilterProps {
@@ -30,13 +34,13 @@ export const QuizzFilter = ({
   applyFilters,
   closeMenuFilters,
 }: QuizzFilterProps) => {
-  const categorySelection = buildOptionFilter(data, "cat");
+  const categorySelection = buildOptionFilter(data, "category");
   const topicSelection = buildOptionFilter(data, "topic");
-  const levelSelection = buildOptionFilter(data, "lvl");
+  const levelSelection = buildOptionFilter(data, "level");
 
   const filterSections: QuizzFilterSection[] = [
     {
-      key: "cat",
+      key: "category",
       label: "Category",
       options: categorySelection,
     },
@@ -46,10 +50,10 @@ export const QuizzFilter = ({
       options: topicSelection,
     },
     {
-      key: "lvl",
+      key: "level",
       label: "Level",
       options: levelSelection,
-    }
+    },
   ];
 
   return (

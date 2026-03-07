@@ -48,7 +48,7 @@ export default function FlashCardItem({
   const handleSpeak = (e: React.MouseEvent) => {
     e.stopPropagation();
     setSpeaking(true);
-    speak(card.vol, card.audioUrl || undefined);
+    speak(card.word);
     setTimeout(() => setSpeaking(false), 1400);
   };
 
@@ -82,18 +82,18 @@ export default function FlashCardItem({
           <div
             className={cn(
               "font-serif font-semibold text-slate-100 text-center mb-1.5 leading-tight",
-              card.vol.length > 16 ? "text-2xl" : "text-[32px]",
+              card.word.length > 16 ? "text-2xl" : "text-[32px]",
             )}
           >
-            {card.vol}
+            {card.word}
           </div>
 
           <div className="font-mono text-xs text-indigo-400 mb-2.5 tracking-wide">
-            {card.transcription}
+            {card.ipa}
           </div>
 
           <div className="font-sans text-[15px] font-light text-white/58">
-            {card.topic}
+            {card.meaning}
           </div>
 
           <button
@@ -116,16 +116,16 @@ export default function FlashCardItem({
 
         {/* BACK */}
         <div className="absolute inset-0 backface-hidden transform-[rotateY(180deg)] rounded-2xl flex flex-col items-center justify-center px-6 py-7 bg-linear-to-br from-[#1a1f35] to-[#131824] border border-purple-500/22 shadow-[0_24px_48px_rgba(0,0,0,0.55)]">
-          <div className="font-mono text-[9px] text-purple-400/55 tracking-widest uppercase mb-4">
+          <div className="font-mono text-[20px] text-purple-400/55 tracking-widest uppercase mb-4">
             Ví dụ
           </div>
 
           <div className="font-serif italic text-lg font-normal text-slate-200 text-center leading-relaxed max-w-82.5">
-            &ldquo;{card.ex}&rdquo;
+            &ldquo;{card.example}&rdquo;
           </div>
 
           <div className="mt-4 font-sans text-[13px] text-white/32">
-            <span className="text-purple-400 font-medium">{card.vol}</span> ·{" "}
+            <span className="text-purple-400 font-medium">{card.word}</span> ·{" "}
             {card.topic}
           </div>
 

@@ -24,17 +24,17 @@ import {
 } from "@/hooks/useQuizzApi";
 import { toast } from "react-toastify";
 
-export type QuizzFilterType = "cat" | "topic" | "lvl";
+export type QuizzFilterType = "category" | "topic" | "level";
 export interface IQuizzFilter {
-  cat: string[];
+  category: string[];
   topic: string[];
-  lvl: string[];
+  level: string[];
   [key: string]: string[];
 }
 const cardInitialFilters: IQuizzFilter = {
-  cat: [],
+  category: [],
   topic: [],
-  lvl: [],
+  level: [],
 };
 
 export default function QuizzDashboardClient() {
@@ -97,15 +97,15 @@ export default function QuizzDashboardClient() {
       const searchTerms = searchQuery.toLowerCase().trim();
       results = results.filter(
         (card) =>
-          card.q.toLowerCase().includes(searchTerms) ||
-          card.cat.toLowerCase().includes(searchTerms) ||
+          card.question.toLowerCase().includes(searchTerms) ||
+          card.category.toLowerCase().includes(searchTerms) ||
           card.topic.toLowerCase().includes(searchTerms),
       );
     }
 
-    if (activeFilters.cat.length > 0) {
+    if (activeFilters.category.length > 0) {
       results = results.filter((card) =>
-        activeFilters.cat.includes(card.cat || ""),
+        activeFilters.category.includes(card.category || ""),
       );
     }
 
@@ -171,12 +171,12 @@ export default function QuizzDashboardClient() {
 
   const defaultQuizz: IQuizz = {
     id: "",
-    cat: "",
+    category: "",
     topic: "",
-    lvl: "",
-    q: "",
-    opts: [],
-    ans: 0,
+    level: "",
+    question: "",
+    options: [],
+    answer: 0,
   };
 
   const handleChange = (field: keyof IQuizz, value: IQuizz[keyof IQuizz]) => {
@@ -441,7 +441,6 @@ export default function QuizzDashboardClient() {
         }}
         onImport={handleImport}
         title="Import Quizzes"
-        description="Upload file Excel với các cột: cat, topic, q, opt1 (bắt buộc), lvl, opt2, opt3, opt4, ans (tùy chọn)."
         isLoading={isImporting}
         externalFile={droppedFile}
       />

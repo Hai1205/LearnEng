@@ -10,10 +10,11 @@ export async function GET() {
         const cards: IFlashCard[] = docs.map((doc) => ({
             id: doc._id.toString(),
             topic: doc.topic ?? "",
-            vol: doc.vol ?? "",
-            transcription: doc.transcription ?? "",
+            word: doc.word ?? "",
+            meaning: doc.meaning ?? "",
+            ipa: doc.ipa ?? "",
             audioUrl: doc.audioUrl ?? "",
-            ex: doc.ex ?? "",
+            example: doc.example ?? "",
         }));
         return NextResponse.json({ data: { cards } });
     } catch (error) {
@@ -28,11 +29,11 @@ export async function GET() {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { topic, vol, transcription, audioUrl, ex } = body;
+        const { topic, word, meaning, ipa, audioUrl, example } = body;
 
-        if (!topic || !vol) {
+        if (!topic || !word) {
             return NextResponse.json(
-                { error: "topic and vol are required" },
+                { error: "topic and word are required" },
                 { status: 400 }
             );
         }
@@ -40,10 +41,11 @@ export async function POST(request: NextRequest) {
         const db = await getDb();
         const result = await db.collection("flashcards").insertOne({
             topic,
-            vol,
-            transcription: transcription ?? "",
+            word,
+            meaning: meaning ?? "",
+            ipa: ipa ?? "",
             audioUrl: audioUrl ?? "",
-            ex: ex ?? "",
+            example: example ?? "",
             createdAt: new Date(),
             updatedAt: new Date(),
         });
@@ -51,10 +53,10 @@ export async function POST(request: NextRequest) {
         const card: IFlashCard = {
             id: result.insertedId.toString(),
             topic,
-            vol,
-            transcription: transcription ?? "",
-            audioUrl: audioUrl ?? "",
-            ex: ex ?? "",
+            word,
+            meaning: meaning ?? "",
+            ipa: ipa ?? "",
+            example: example ?? "",
         };
 
         return NextResponse.json({ data: { card } }, { status: 201 });

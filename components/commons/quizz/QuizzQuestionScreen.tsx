@@ -42,7 +42,7 @@ export default function QuizzQuestionScreen({
   onNext,
   onExit,
 }: QuizzQuestionScreenProps) {
-  const lv = LEVEL_COLORS[question.lvl];
+  const lv = LEVEL_COLORS[question.level];
   const progress = ((idx + 1) / total) * 100;
 
   return (
@@ -86,25 +86,22 @@ export default function QuizzQuestionScreen({
               className="py-0.5 px-2.5 rounded-full text-xs font-bold"
               style={{ background: lv.bg, color: lv.color }}
             >
-              {lv.emoji} {question.lvl}
+              {lv.emoji} {question.level}
             </span>
           )}
           <span className="bg-sky-400/10 text-sky-400 py-0.5 px-2.5 rounded-full text-xs font-bold">
-            {question.cat}
-          </span>
-          <span className="bg-white/5 text-white/30 py-0.5 px-2.5 rounded-full text-[11px]">
-            #{question.id.slice(-6)}
+            {question.category}
           </span>
         </div>
 
         {/* Question */}
         <p className="text-white/92 text-[17px] leading-relaxed m-0 mb-6 font-medium">
-          {question.q}
+          {question.question}
         </p>
 
         {/* Options */}
         <div className="flex flex-col gap-2.5">
-          {question.opts.map((opt, i) => {
+          {question.options.map((opt, i) => {
             let borderColor = "border-white/10";
             let bgColor = "bg-white/4";
             let textColor = "text-white/75";
@@ -118,12 +115,12 @@ export default function QuizzQuestionScreen({
             }
 
             if (confirmed) {
-              if (i === question.ans) {
+              if (i === question.answer) {
                 borderColor = "border-emerald-500";
                 bgColor = "bg-emerald-500/15";
                 textColor = "text-emerald-500";
                 labelBg = "bg-emerald-500/25";
-              } else if (i === selected && selected !== question.ans) {
+              } else if (i === selected && selected !== question.answer) {
                 borderColor = "border-red-500";
                 bgColor = "bg-red-500/12";
                 textColor = "text-red-500";
@@ -154,12 +151,14 @@ export default function QuizzQuestionScreen({
                   {LABELS[i]}
                 </span>
                 <span className="flex-1">{opt}</span>
-                {confirmed && i === question.ans && (
+                {confirmed && i === question.answer && (
                   <span className="text-base">✓</span>
                 )}
-                {confirmed && i === selected && selected !== question.ans && (
-                  <span className="text-base">✗</span>
-                )}
+                {confirmed &&
+                  i === selected &&
+                  selected !== question.answer && (
+                    <span className="text-base">✗</span>
+                  )}
               </button>
             );
           })}

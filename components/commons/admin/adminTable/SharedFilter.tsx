@@ -21,27 +21,29 @@ interface SharedFilterProps<T = string, S = any> {
   filterSections: S[];
 }
 
-export interface IOptionFilter { label: string; value: string }
+export interface IOptionFilter {
+  label: string;
+  value: string;
+}
 
 export const buildOptionFilter = <T, K extends keyof T>(
   data: T[],
-  field: K
+  field: K,
 ): IOptionFilter[] => {
+  const uniqueValues = new Set<string>();
 
-  const uniqueValues = new Set<string>()
-
-  data.forEach(item => {
-    const value = item[field]
+  data.forEach((item) => {
+    const value = item[field];
     if (value !== undefined && value !== null) {
-      uniqueValues.add(String(value))
+      uniqueValues.add(String(value));
     }
-  })
+  });
 
-  return Array.from(uniqueValues).map(v => ({
+  return Array.from(uniqueValues).map((v) => ({
     label: v,
-    value: v
-  }))
-}
+    value: v,
+  }));
+};
 
 export const SharedFilter = <
   T = string,
@@ -83,19 +85,18 @@ export const SharedFilter = <
         </DropdownMenuLabel>
 
         <DropdownMenuSeparator className="bg-border/50" />
-        <ScrollArea className="max-h-100">
-          {" "}
+        <ScrollArea className="h-56 overflow-y-auto">
           {filterSections.map((section, index) => (
-            <div key={section.key} className="p-3">
-              <h4 className="mb-3 text-sm font-semibold text-foreground">
+            <div key={section.key} className="p-2.5">
+              <h4 className="mb-2 text-sm font-semibold text-foreground">
                 {section.label}
               </h4>
 
-              <div className="space-y-3">
+              <div className="space-y-0.5">
                 {section.options.map((option) => (
                   <div
                     key={option.value}
-                    className="flex items-center hover:bg-primary/5 p-1.5 rounded-lg transition-colors"
+                    className="flex items-center hover:bg-primary/5 py-1 px-1.5 rounded-lg transition-colors"
                   >
                     <Checkbox
                       id={`${section.key}-${option.value}`}
@@ -128,7 +129,7 @@ export const SharedFilter = <
 
         <DropdownMenuSeparator className="bg-border/50" />
 
-        <div className="p-3 flex justify-between gap-2">
+        <div className="p-2.5 flex justify-between gap-2">
           <Button
             variant="outline"
             size="sm"

@@ -3,20 +3,20 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAllFlashCardsQuery } from "@/hooks/useFlashCardApi";
 import {
-  useVocabularyProgressQuery,
-  useUpdateVocabularyProgressMutation,
+  useWordProgressQuery,
+  useUpdateWordProgressMutation,
 } from "@/hooks/useVocabularyProgressApi";
-import FlashCardHeader from "./FlashCardHeader";
 import FlashCardControls from "./FlashCardControls";
 import FlashCardItem from "./FlashCardItem";
 import FlashCardNavigation from "./FlashCardNavigation";
 import FlashCardActions from "./FlashCardActions";
+import FlashCardSkeleton from "./FlashCardSkeleton";
 
 export default function FlashCardClient() {
   const { data: cardsData, isLoading: cardsLoading } = useAllFlashCardsQuery();
   const { data: progressData, isLoading: progressLoading } =
-    useVocabularyProgressQuery();
-  const updateProgress = useUpdateVocabularyProgressMutation();
+    useWordProgressQuery();
+  const updateProgress = useUpdateWordProgressMutation();
 
   const [mode, setMode] = useState<"all" | "unlearned">("all");
   const [topic, setTopic] = useState("");
@@ -87,20 +87,19 @@ export default function FlashCardClient() {
     setFlipped(false);
   }, [mode, topic]);
 
-  if (cardsLoading || progressLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-white/40 font-sans text-sm animate-pulse">
-          Đang tải dữ liệu...
-        </div>
-      </div>
-    );
+  if ((cardsLoading || progressLoading) && (!cardsData || !progressData)) {
+    return <FlashCardSkeleton />;
   }
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center px-4 pb-12 font-serif">
       <div className="w-full max-w-115 pt-8">
-        <FlashCardHeader totalWords={allCards.length} />
+        <div className="text-center mb-6">
+          <h1 className="font-serif text-[28px] font-semibold text-slate-200 tracking-tight mb-1">
+            Word Cards
+          </h1>
+        </div>
+
         <FlashCardControls
           mode={mode}
           setMode={setMode}

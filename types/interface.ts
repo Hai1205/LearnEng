@@ -19,21 +19,21 @@ declare global {
 
     interface IQuizz {
         id: string
-        cat: string
+        category: string
         topic: string
-        lvl: string
-        q: string
-        opts: string[]
-        ans: number
+        level: string
+        question: string
+        options: string[]
+        answer: number
     }
 
     interface IFlashCard {
         id: string
         topic: string
-        vol: string
-        transcription: string
-        audioUrl: string
-        ex: string
+        word: string
+        meaning: string
+        ipa: string
+        example: string
     }
 
     interface IQuizzResult {
@@ -44,7 +44,7 @@ declare global {
         answeredAt: string
     }
 
-    interface IVocabularyProgress {
+    interface IWordProgress {
         id: string
         flashCardId: string
         isMemorized: boolean
@@ -55,9 +55,9 @@ declare global {
         totalQuestions: number
         correctAnswers: number
         wrongAnswers: number
-        totalVocabulary: number
-        memorizedVocabulary: number
-        unmemorizedVocabulary: number
+        totalWord: number
+        memorizedWord: number
+        unmemorizedWord: number
     }
 }
 

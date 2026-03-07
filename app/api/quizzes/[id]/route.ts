@@ -13,19 +13,19 @@ export async function PUT(
         }
 
         const body = await request.json();
-        const { cat, topic, lvl, q, opts, ans } = body;
+        const { category, topic, level, question, options, answer } = body;
 
         const db = await getDb();
         const result = await db.collection("quizzes").findOneAndUpdate(
             { _id: new ObjectId(id) },
             {
                 $set: {
-                    ...(cat !== undefined && { cat }),
+                    ...(category !== undefined && { category }),
                     ...(topic !== undefined && { topic }),
-                    ...(lvl !== undefined && { lvl }),
-                    ...(q !== undefined && { q }),
-                    ...(opts !== undefined && { opts }),
-                    ...(ans !== undefined && { ans }),
+                    ...(level !== undefined && { level }),
+                    ...(question !== undefined && { question }),
+                    ...(options !== undefined && { options }),
+                    ...(answer !== undefined && { answer }),
                     updatedAt: new Date(),
                 },
             },
@@ -41,12 +41,12 @@ export async function PUT(
 
         const card: IQuizz = {
             id: result._id.toString(),
-            cat: result.cat ?? "",
+            category: result.category ?? "",
             topic: result.topic ?? "",
-            lvl: result.lvl ?? "",
-            q: result.q ?? "",
-            opts: result.opts ?? [],
-            ans: result.ans ?? 0,
+            level: result.level ?? "",
+            question: result.question ?? "",
+            options: result.options ?? [],
+            answer: result.answer ?? 0,
         };
 
         return NextResponse.json({ data: { card } });

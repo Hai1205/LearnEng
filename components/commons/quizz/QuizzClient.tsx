@@ -6,12 +6,13 @@ import { useSaveQuizzResultMutation } from "@/hooks/useQuizzResultApi";
 import QuizzHomeScreen from "./QuizzHomeScreen";
 import QuizzQuestionScreen from "./QuizzQuestionScreen";
 import QuizzResultScreen from "./QuizzResultScreen";
+import QuizzSkeleton from "./QuizzSkeleton";
 
 interface AnswerRecord {
   qid: string;
   correct: boolean;
   chosen: number;
-  ans: number;
+  answer: number;
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -30,14 +31,14 @@ export default function QuizzClient() {
   const allQuestions = useMemo(() => quizzData?.data?.cards ?? [], [quizzData]);
 
   const categories = useMemo(
-    () => [...new Set(allQuestions.map((q) => q.cat))].sort(),
+    () => [...new Set(allQuestions.map((q) => q.category))].sort(),
     [allQuestions],
   );
 
   const [screen, setScreen] = useState<"home" | "quiz" | "result">("home");
   const [settings, setSettings] = useState({
     level: "all",
-    cat: "all",
+    category: "all",
     topic: "all",
     count: 20,
     shuffle: true,
@@ -52,16 +53,16 @@ export default function QuizzClient() {
 
   const topics = useMemo(
     () =>
-      settings.cat === "all"
+      settings.category === "all"
         ? []
         : [
             ...new Set(
               allQuestions
-                .filter((q) => q.cat === settings.cat)
+                .filter((q) => q.category === settings.category)
                 .map((q) => q.topic),
             ),
           ].sort(),
-    [allQuestions, settings.cat],
+    [allQuestions, settings.category],
   );
 
   useEffect(() => {
@@ -73,9 +74,9 @@ export default function QuizzClient() {
   const startQuiz = useCallback(() => {
     let filtered = allQuestions;
     if (settings.level !== "all")
-      filtered = filtered.filter((q) => q.lvl === settings.level);
-    if (settings.cat !== "all")
-      filtered = filtered.filter((q) => q.cat === settings.cat);
+      filtered = filtered.filter((q) => q.level === settings.level);
+    if (settings.category !== "all")
+      filtered = filtered.filter((q) => q.category === settings.category);
     if (settings.topic !== "all")
       filtered = filtered.filter((q) => q.topic === settings.topic);
     const count = Math.min(settings.count, filtered.length);
@@ -99,11 +100,11 @@ export default function QuizzClient() {
   const handleConfirm = () => {
     if (selected === null) return;
     const q = pool[idx];
-    const correct = selected === q.ans;
+    const correct = selected === q.answer;
     setConfirmed(true);
     setAnswers((prev) => [
       ...prev,
-      { qid: q.id, correct, chosen: selected, ans: q.ans },
+      { qid: q.id, correct, chosen: selected, answer: q.answer },
     ]);
     setStreak((prev) => (correct ? prev + 1 : 0));
 
@@ -124,6 +125,10 @@ export default function QuizzClient() {
     }
   };
 
+  if (isLoading) {
+    return <QuizzSkeleton />;
+  }
+
   if (screen === "home") {
     return (
       <QuizzHomeScreen
@@ -132,7 +137,7 @@ export default function QuizzClient() {
         categories={categories}
         topics={topics}
         onStart={startQuiz}
-        isLoading={isLoading}
+        isLoading={false}
         totalQuestions={allQuestions.length}
       />
     );

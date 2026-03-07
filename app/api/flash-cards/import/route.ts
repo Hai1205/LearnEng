@@ -4,9 +4,8 @@ import * as XLSX from "xlsx";
 
 export const dynamic = "force-dynamic";
 
-const REQUIRED_COLUMNS = ["topic", "vol"];
-const OPTIONAL_COLUMNS = ["transcription", "audioUrl", "ex"];
-const ALL_COLUMNS = [...REQUIRED_COLUMNS, ...OPTIONAL_COLUMNS];
+const REQUIRED_COLUMNS = ["topic", "word"];
+const OPTIONAL_COLUMNS = ["meaning", "ipa", "audioUrl", "example"];
 
 export async function POST(request: NextRequest) {
     try {
@@ -70,10 +69,10 @@ export async function POST(request: NextRequest) {
         const errors: string[] = [];
         const validDocs: {
             topic: string;
-            vol: string;
-            transcription: string;
-            audioUrl: string;
-            ex: string;
+            word: string;
+            meaning: string;
+            ipa: string;
+            example: string;
             createdAt: Date;
             updatedAt: Date;
         }[] = [];
@@ -83,21 +82,21 @@ export async function POST(request: NextRequest) {
             const rowNum = i + 2; // +2 because row 1 is header, data starts at row 2
 
             const topic = String(row.topic ?? "").trim();
-            const vol = String(row.vol ?? "").trim();
+            const word = String(row.word ?? "").trim();
 
-            if (!topic || !vol) {
+            if (!topic || !word) {
                 errors.push(
-                    `Row ${rowNum}: missing required fields (topic, vol)`
+                    `Row ${rowNum}: missing required fields (topic, word)`
                 );
                 continue;
             }
 
             validDocs.push({
                 topic,
-                vol,
-                transcription: String(row.transcription ?? "").trim(),
-                audioUrl: String(row.audioUrl ?? "").trim(),
-                ex: String(row.ex ?? "").trim(),
+                word,
+                meaning: String(row.meaning ?? "").trim(),
+                ipa: String(row.ipa ?? "").trim(),
+                example: String(row.example ?? "").trim(),
                 createdAt: new Date(),
                 updatedAt: new Date(),
             });
@@ -119,10 +118,10 @@ export async function POST(request: NextRequest) {
         const cards: IFlashCard[] = validDocs.map((doc, idx) => ({
             id: result.insertedIds[idx].toString(),
             topic: doc.topic,
-            vol: doc.vol,
-            transcription: doc.transcription,
-            audioUrl: doc.audioUrl,
-            ex: doc.ex,
+            word: doc.word,
+            meaning: doc.meaning,
+            ipa: doc.ipa,
+            example: doc.example,
         }));
 
         return NextResponse.json(

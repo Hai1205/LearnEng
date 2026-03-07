@@ -11,21 +11,6 @@ export const Footer = () => {
               © 2026 LearnVolEng. All rights reserved.
             </span>
           </div>
-          <div className="flex items-center gap-6">
-            <a
-              href="/terms-of-service"
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-            >
-              Terms of Service
-            </a>
-            <span className="text-muted-foreground/30">•</span>
-            <a
-              href="/privacy-policy"
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-            >
-              Privacy Policy
-            </a>
-          </div>
         </div>
       </div>
     </footer>

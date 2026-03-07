@@ -1,9 +1,9 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DataTable } from "../adminTable/DataTable";
-import { Pencil, Key, Trash2, Eye } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { PaginationData } from "@/components/commons/layout/pagination/PaginationControls";
+import { SpeakButton } from "./SpeakButton";
 
-interface FlashCardTableeProps {
+interface FlashCardTableProps {
   cards: IFlashCard[];
   isLoading: boolean;
   onUpdate?: (card: IFlashCard) => void;
@@ -13,7 +13,7 @@ interface FlashCardTableeProps {
   showPagination?: boolean;
 }
 
-export const FlashCardTablee = ({
+export const FlashCardTable = ({
   cards,
   isLoading,
   onUpdate,
@@ -21,7 +21,7 @@ export const FlashCardTablee = ({
   paginationData,
   onPageChange,
   showPagination = false,
-}: FlashCardTableeProps) => {
+}: FlashCardTableProps) => {
   const columns = [
     {
       header: "No",
@@ -41,29 +41,37 @@ export const FlashCardTablee = ({
       ),
     },
     {
-      header: "Volcabulary",
+      header: "Word",
       accessor: (card: IFlashCard) => (
         <div className="inline-flex items-center justify-center gap-2">
-          <span className="capitalize">{card.vol}</span>
+          <span className="capitalize">{card.word}</span>
         </div>
       ),
     },
     {
-      header: "Transcription",
+      header: "Meaning",
       accessor: (card: IFlashCard) => (
         <div className="inline-flex items-center justify-center gap-2">
-          <span className="capitalize">{card.transcription}</span>
+          <span className="capitalize">{card.meaning}</span>
         </div>
       ),
     },
-    // {
-    //   header: "Example",
-    //   accessor: (card: IFlashCard) => (
-    //     <div className="inline-flex items-center justify-center gap-2">
-    //       <span className="capitalize">{card.ex}</span>
-    //     </div>
-    //   ),
-    // },
+    {
+      header: "IPA",
+      accessor: (card: IFlashCard) => (
+        <div className="inline-flex items-center justify-center gap-2">
+          <span className="capitalize">{card.ipa}</span>
+        </div>
+      ),
+    },
+    {
+      header: "Voice",
+      accessor: (card: IFlashCard) => (
+        <div className="inline-flex items-center justify-center gap-2">
+          <SpeakButton word={card.word} />
+        </div>
+      ),
+    },
   ];
 
   const actions = [];
