@@ -1,0 +1,450 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { TableDashboardSkeleton } from "../adminTable/TableDashboardSkeleton";
+import { DashboardHeader } from "../layout/dashboard/DashboardHeader";
+import { CreateQuizzDialog } from "./CreateQuizzDialog";
+import { UpdateQuizzDialog } from "./UpdateQuizzDialog";
+import { TableSearch } from "../adminTable/TableSearch";
+import { QuizzFilter } from "./QuizzFilter";
+import { QuizzTable } from "./QuizzTable";
+import { ConfirmationDialog } from "../../layout/ConfirmationDialog";
+import { useQuizzStore } from "@/stores/quizzStore";
+import { ImportExcelDialog } from "../layout/dialog/ImportExcelDialog";
+import { DraggingOnPage } from "../../layout/Dragging/DraggingOnPage";
+import {
+  useAllQuizzesQuery,
+  useCreateQuizzMutation,
+  useUpdateQuizzMutation,
+  useDeleteQuizzMutation,
+  useImportQuizzesMutation,
+} from "@/hooks/useQuizzApi";
+import { toast } from "react-toastify";
+
+export type QuizzFilterType = "cat" | "topic" | "lvl";
+export interface IQuizzFilter {
+  cat: string[];
+  topic: string[];
+  lvl: string[];
+  [key: string]: string[];
+}
+const cardInitialFilters: IQuizzFilter = {
+  cat: [],
+  topic: [],
+  lvl: [],
+};
+
+export default function QuizzDashboardClient() {
+  const {
+    adminQuizzes,
+    setAdminQuizzes,
+    removeFromAdminQuizzes,
+    addToAdminQuizzes,
+    updateInAdminQuizzes,
+  } = useQuizzStore();
+
+  const {
+    data: cardsResponse,
+    isLoading: isLoadingQuizzes,
+    refetch: refetchQuizzes,
+  } = useAllQuizzesQuery();
+
+  const { mutateAsync: createQuizzAsync } = useCreateQuizzMutation();
+  const { mutateAsync: updateQuizzAsync } = useUpdateQuizzMutation();
+  const { mutateAsync: deleteQuizzAsync } = useDeleteQuizzMutation();
+  const { mutateAsync: importQuizzesAsync, isPending: isImporting } =
+    useImportQuizzesMutation();
+
+  useEffect(() => {
+    const cards = cardsResponse?.data?.cards;
+    setAdminQuizzes(cards || []);
+  }, [cardsResponse?.data?.cards, setAdminQuizzes]);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isCreateQuizzOpen, setIsCreateQuizzOpen] = useState(false);
+  const [isUpdateQuizzOpen, setIsUpdateQuizzOpen] = useState(false);
+
+  const [activeFilters, setActiveFilters] =
+    useState<IQuizzFilter>(cardInitialFilters);
+  const [filteredQuizzes, setFilteredQuizzes] = useState<IQuizz[]>([]);
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+  const totalPages = Math.ceil(filteredQuizzes.length / pageSize);
+
+  const paginationState = { page: currentPage, pageSize: pageSize };
+  const paginationData = {
+    totalElements: filteredQuizzes.length,
+    totalPages: totalPages,
+    currentPage: currentPage,
+    pageSize: pageSize,
+    hasNext: currentPage < totalPages,
+    hasPrevious: currentPage > 1,
+  };
+
+  const setPage = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  useEffect(() => {
+    let results = [...adminQuizzes];
+
+    if (searchQuery.trim()) {
+      const searchTerms = searchQuery.toLowerCase().trim();
+      results = results.filter(
+        (card) =>
+          card.q.toLowerCase().includes(searchTerms) ||
+          card.cat.toLowerCase().includes(searchTerms) ||
+          card.topic.toLowerCase().includes(searchTerms),
+      );
+    }
+
+    if (activeFilters.cat.length > 0) {
+      results = results.filter((card) =>
+        activeFilters.cat.includes(card.cat || ""),
+      );
+    }
+
+    if (activeFilters.topic.length > 0) {
+      results = results.filter((card) =>
+        activeFilters.topic.includes(card.topic || ""),
+      );
+    }
+
+    setFilteredQuizzes(results);
+    setCurrentPage(1);
+  }, [adminQuizzes, searchQuery, activeFilters]);
+
+  // Paginate filtered quizzes
+  const paginatedQuizzes = filteredQuizzes.slice(
+    (paginationState.page - 1) * paginationState.pageSize,
+    paginationState.page * paginationState.pageSize,
+  );
+
+  const toggleFilter = (value: string, type: QuizzFilterType) => {
+    setActiveFilters((prev) => {
+      const updated = { ...prev };
+      if (updated[type]?.includes(value)) {
+        updated[type] = updated[type].filter((item) => item !== value);
+      } else {
+        updated[type] = [...(updated[type] || []), value];
+      }
+      return updated;
+    });
+  };
+
+  const clearFilters = () => {
+    setActiveFilters(cardInitialFilters);
+    setSearchQuery("");
+    setFilteredQuizzes(adminQuizzes);
+    closeMenuFilters();
+  };
+
+  const applyFilters = () => {
+    closeMenuFilters();
+  };
+
+  const handleRefresh = () => {
+    setActiveFilters(cardInitialFilters);
+    setSearchQuery("");
+    refetchQuizzes();
+  };
+
+  const [openMenuFilters, setOpenMenuFilters] = useState(false);
+  const closeMenuFilters = () => setOpenMenuFilters(false);
+
+  const [dialogKey, setDialogKey] = useState(0);
+
+  const [data, setData] = useState<IQuizz | null>(null);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [cardToDelete, setQuizzToDelete] = useState<IQuizz | null>(null);
+
+  // Import
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [isDraggingOnPage, setIsDraggingOnPage] = useState(false);
+  const [droppedFile, setDroppedFile] = useState<File | null>(null);
+
+  const defaultQuizz: IQuizz = {
+    id: "",
+    cat: "",
+    topic: "",
+    lvl: "",
+    q: "",
+    opts: [],
+    ans: 0,
+  };
+
+  const handleChange = (field: keyof IQuizz, value: IQuizz[keyof IQuizz]) => {
+    setData((prev) => {
+      if (!prev) {
+        return { ...defaultQuizz, [field]: value } as IQuizz;
+      }
+
+      return { ...prev, [field]: value };
+    });
+  };
+
+  const handleUpdate = async () => {
+    if (!data) return;
+
+    updateQuizzAsync(
+      {
+        cardId: data.id,
+        data: data,
+      },
+      {
+        onSuccess: (response) => {
+          const card = response?.data?.card;
+          if (card) {
+            updateInAdminQuizzes(card);
+          }
+
+          setIsUpdateQuizzOpen(false);
+        },
+      },
+    );
+  };
+
+  const handleCreate = async () => {
+    if (!data) return;
+
+    createQuizzAsync(data, {
+      onSuccess: (response) => {
+        const card = response?.data?.card;
+        if (card) {
+          addToAdminQuizzes(card);
+        }
+
+        setIsCreateQuizzOpen(false);
+      },
+    });
+  };
+
+  const onDelete = (card: IQuizz) => {
+    setQuizzToDelete(card);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDialogClose = (open: boolean) => {
+    if (!open) {
+      setDeleteDialogOpen(false);
+      setQuizzToDelete(null);
+    }
+  };
+
+  const handleDialogConfirm = async () => {
+    if (!cardToDelete) return;
+
+    deleteQuizzAsync(cardToDelete.id, {
+      onSuccess: () => {
+        removeFromAdminQuizzes(cardToDelete.id);
+        setDeleteDialogOpen(false);
+        setQuizzToDelete(null);
+      },
+    });
+  };
+
+  const onUpdate = async (card: IQuizz) => {
+    setData(card);
+    setIsUpdateQuizzOpen(true);
+  };
+
+  // Import handlers
+  const handleImport = async (file: File) => {
+    importQuizzesAsync(file, {
+      onSuccess: (response) => {
+        const { imported, errors, cards } = response.data;
+        cards.forEach((c) => addToAdminQuizzes(c));
+        toast.success(`Import thành công ${imported} quizzes!`);
+        if (errors && errors.length > 0) {
+          toast.warning(`${errors.length} dòng bị bỏ qua do lỗi`);
+        }
+        setIsImportDialogOpen(false);
+        setDroppedFile(null);
+      },
+      onError: (error) => {
+        toast.error(error.message || "Import thất bại");
+      },
+    });
+  };
+
+  const handlePageDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer.types.includes("Files")) {
+      setIsDraggingOnPage(true);
+    }
+  };
+
+  const handlePageDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.currentTarget === e.target) {
+      setIsDraggingOnPage(false);
+    }
+  };
+
+  const handlePageDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handlePageDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOnPage(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file && (file.name.endsWith(".xlsx") || file.name.endsWith(".xls"))) {
+      setDroppedFile(file);
+      setIsImportDialogOpen(true);
+    } else if (file) {
+      toast.error("Chỉ chấp nhận file Excel (.xlsx, .xls)!");
+    }
+  };
+
+  if (isLoadingQuizzes) {
+    return <TableDashboardSkeleton />;
+  }
+
+  return (
+    <div
+      className="space-y-4 relative"
+      onDragEnter={handlePageDragEnter}
+      onDragLeave={handlePageDragLeave}
+      onDragOver={handlePageDragOver}
+      onDrop={handlePageDrop}
+    >
+      {isDraggingOnPage && (
+        <DraggingOnPage
+          title="Thả file Excel vào đây"
+          subtitle="để import quizzes"
+        />
+      )}
+
+      <DashboardHeader
+        title="Quiz Dashboard"
+        onCreateClick={() => {
+          setData(defaultQuizz);
+          setIsCreateQuizzOpen(true);
+        }}
+        createButtonText="Create Quizz"
+        onImportClick={() => {
+          setDroppedFile(null);
+          setIsImportDialogOpen(true);
+        }}
+        importButtonText="Import Excel"
+      />
+
+      {/* Use consistent key to avoid hydration issues */}
+      <CreateQuizzDialog
+        key={`create-${dialogKey}-${isCreateQuizzOpen ? "open" : "closed"}`}
+        isOpen={isCreateQuizzOpen}
+        onOpenChange={(open) => {
+          setIsCreateQuizzOpen(open);
+          if (!open) {
+            setData(null);
+            setDialogKey((prev) => prev + 1);
+          }
+        }}
+        onChange={handleChange}
+        onQuizzCreated={handleCreate}
+        data={data}
+      />
+
+      <UpdateQuizzDialog
+        key={`update-${dialogKey}-${isUpdateQuizzOpen ? "open" : "closed"}`}
+        isOpen={isUpdateQuizzOpen}
+        onOpenChange={(open) => {
+          setIsUpdateQuizzOpen(open);
+          if (!open) {
+            setData(null);
+            setDialogKey((prev) => prev + 1);
+          }
+        }}
+        onChange={handleChange}
+        data={data}
+        onQuizzUpdated={handleUpdate}
+      />
+
+      <div className="space-y-4">
+        <Card className="border-border/50 shadow-lg bg-linear-to-br from-card to-card/80 backdrop-blur-sm">
+          <CardHeader className="pb-4 border-b border-border/30">
+            <div className="flex items-center justify-between">
+              <CardTitle />
+
+              <div className="flex items-center gap-3">
+                <TableSearch
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  placeholder="Search Quizzes..."
+                />
+
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="h-9 gap-2 px-4 bg-linear-to-br from-secondary/80 to-secondary hover:from-secondary hover:to-secondary/90 shadow-md hover:shadow-lg hover:shadow-secondary/20 transition-all duration-200 hover:scale-105"
+                  onClick={async () => {
+                    handleRefresh();
+                  }}
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Refresh
+                </Button>
+
+                <QuizzFilter
+                  data={adminQuizzes}
+                  openMenuFilters={openMenuFilters}
+                  setOpenMenuFilters={setOpenMenuFilters}
+                  activeFilters={activeFilters}
+                  toggleFilter={toggleFilter}
+                  clearFilters={clearFilters}
+                  applyFilters={applyFilters}
+                  closeMenuFilters={closeMenuFilters}
+                />
+              </div>
+            </div>
+          </CardHeader>
+
+          <QuizzTable
+            cards={paginatedQuizzes}
+            isLoading={false}
+            onUpdate={onUpdate}
+            onDelete={onDelete}
+            showPagination={filteredQuizzes.length > 10}
+            paginationData={paginationData}
+            onPageChange={setPage}
+          />
+        </Card>
+      </div>
+
+      <ConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={handleDialogClose}
+        title="Delete Quizz"
+        description="This action cannot be undone. This will permanently delete the quiz and remove it from our servers."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isDestructive={true}
+        onConfirm={handleDialogConfirm}
+      />
+
+      <ImportExcelDialog
+        isOpen={isImportDialogOpen}
+        onOpenChange={(open) => {
+          setIsImportDialogOpen(open);
+          if (!open) setDroppedFile(null);
+        }}
+        onImport={handleImport}
+        title="Import Quizzes"
+        description="Upload file Excel với các cột: cat, topic, q, opt1 (bắt buộc), lvl, opt2, opt3, opt4, ans (tùy chọn)."
+        isLoading={isImporting}
+        externalFile={droppedFile}
+      />
+    </div>
+  );
+}

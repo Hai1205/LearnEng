@@ -1,0 +1,199 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+:root {
+  /* Background: #0d1117 (GitHub Dark) */
+  --background: #0d1117;
+  --foreground: #e6edf3;
+  --card: #161b22;
+  --card-foreground: #e6edf3;
+  --popover: #161b22;
+  --popover-foreground: #e6edf3;
+  /* Primary: Sky Blue #38bdf8 */
+  --primary: #38bdf8;
+  --primary-foreground: #0d1117;
+  /* Secondary: Indigo #818cf8 */
+  --secondary: #818cf8;
+  --secondary-foreground: #0d1117;
+  --muted: #21262d;
+  --muted-foreground: #8b949e;
+  --accent: #21262d;
+  --accent-foreground: #38bdf8;
+  --destructive: #f85149;
+  --destructive-foreground: #ffffff;
+  --border: #30363d;
+  --input: #30363d;
+  --ring: #38bdf8;
+  --chart-1: #38bdf8;
+  --chart-2: #818cf8;
+  --chart-3: #a78bfa;
+  --chart-4: #c084fc;
+  --chart-5: #e879f9;
+  --radius: 0.625rem;
+  --sidebar: #161b22;
+  --sidebar-foreground: #e6edf3;
+  --sidebar-primary: #38bdf8;
+  --sidebar-primary-foreground: #0d1117;
+  --sidebar-accent: #21262d;
+  --sidebar-accent-foreground: #38bdf8;
+  --sidebar-border: #30363d;
+  --sidebar-ring: #818cf8;
+}
+
+.dark {
+  /* Background: #0d1117 (GitHub Dark) */
+  --background: #0d1117;
+  --foreground: #e6edf3;
+  --card: #161b22;
+  --card-foreground: #e6edf3;
+  --popover: #161b22;
+  --popover-foreground: #e6edf3;
+  /* Primary: Sky Blue #38bdf8 */
+  --primary: #38bdf8;
+  --primary-foreground: #0d1117;
+  /* Secondary: Indigo #818cf8 */
+  --secondary: #818cf8;
+  --secondary-foreground: #0d1117;
+  --muted: #21262d;
+  --muted-foreground: #8b949e;
+  --accent: #21262d;
+  --accent-foreground: #38bdf8;
+  --destructive: #f85149;
+  --destructive-foreground: #ffffff;
+  --border: #30363d;
+  --input: #30363d;
+  --ring: #38bdf8;
+  --chart-1: #38bdf8;
+  --chart-2: #818cf8;
+  --chart-3: #a78bfa;
+  --chart-4: #c084fc;
+  --chart-5: #e879f9;
+  --sidebar: #161b22;
+  --sidebar-foreground: #e6edf3;
+  --sidebar-primary: #38bdf8;
+  --sidebar-primary-foreground: #0d1117;
+  --sidebar-accent: #21262d;
+  --sidebar-accent-foreground: #38bdf8;
+  --sidebar-border: #30363d;
+  --sidebar-ring: #818cf8;
+}
+
+@theme inline {
+  /* optional: --font-sans, --font-serif, --font-mono if they are applied in the layout.tsx */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Apply cursor pointer to all buttons, links, and clickable elements */
+  button,
+  a,
+  [role="button"],
+  [type="button"],
+  [type="submit"],
+  [type="reset"],
+  .cursor-pointer {
+    cursor: pointer;
+  }
+}
+
+/* Flash card fade-out animation */
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+/* Toastify custom styles */
+.Toastify__toast-container {
+  z-index: 9999;
+  position: fixed !important;
+}
+
+.Toastify__toast {
+  font-family: inherit;
+  border-radius: 0.5rem;
+}
+
+.Toastify__toast--dark {
+  background: oklch(0.205 0 0);
+  color: oklch(0.985 0 0);
+}
+
+.Toastify__toast--success {
+  background: oklch(0.6 0.118 184.704);
+}
+
+.Toastify__toast--error {
+  background: oklch(0.577 0.245 27.325);
+}
+
+.Toastify__toast--info {
+  background: oklch(0.488 0.243 264.376);
+}
+
+/* Ensure body doesn't shift when toast appears */
+body {
+  overflow-x: hidden;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari and Opera */
+}
