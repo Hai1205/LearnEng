@@ -5,7 +5,7 @@ import * as XLSX from "xlsx";
 export const dynamic = "force-dynamic";
 
 const REQUIRED_COLUMNS = ["topic", "word"];
-const OPTIONAL_COLUMNS = ["meaning", "ipa", "audioUrl", "example"];
+const OPTIONAL_COLUMNS = ["meaning", "ipa", "example"];
 
 export async function POST(request: NextRequest) {
     try {

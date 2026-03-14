@@ -13,7 +13,7 @@ export async function PUT(
         }
 
         const body = await request.json();
-        const { category, topic, level, question, options, answer } = body;
+        const { category, topic, level, question, options, answer, explaining } = body;
 
         const db = await getDb();
         const result = await db.collection("quizzes").findOneAndUpdate(
@@ -26,6 +26,7 @@ export async function PUT(
                     ...(question !== undefined && { question }),
                     ...(options !== undefined && { options }),
                     ...(answer !== undefined && { answer }),
+                    ...(explaining !== undefined && { explaining }),
                     updatedAt: new Date(),
                 },
             },
@@ -47,6 +48,7 @@ export async function PUT(
             question: result.question ?? "",
             options: result.options ?? [],
             answer: result.answer ?? 0,
+            explaining: result.explaining ?? "",
         };
 
         return NextResponse.json({ data: { card } });

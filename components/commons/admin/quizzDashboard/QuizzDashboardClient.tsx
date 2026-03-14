@@ -162,21 +162,16 @@ export default function QuizzDashboardClient() {
     }
 
     const rows = adminQuizzes.map((quiz) => ({
-      Category: quiz.category,
-      Topic: quiz.topic,
-      Level: quiz.level,
-      Question: quiz.question,
-      OptionA: quiz.options?.[0] || "",
-      OptionB: quiz.options?.[1] || "",
-      OptionC: quiz.options?.[2] || "",
-      OptionD: quiz.options?.[3] || "",
-      Answer: quiz.answer,
-      Explaining:
-        (quiz as IQuizz & { explaining?: string; eplanning?: string })
-          .explaining ||
-        (quiz as IQuizz & { explaining?: string; eplanning?: string })
-          .eplanning ||
-        "",
+      category: quiz.category,
+      topic: quiz.topic,
+      level: quiz.level,
+      question: quiz.question,
+      option1: quiz.options?.[0] || "",
+      option2: quiz.options?.[1] || "",
+      option3: quiz.options?.[2] || "",
+      option4: quiz.options?.[3] || "",
+      answer: quiz.answer,
+      explaining: quiz.explaining || "",
     }));
 
     const wb = XLSX.utils.book_new();
@@ -208,6 +203,7 @@ export default function QuizzDashboardClient() {
     question: "",
     options: [],
     answer: 0,
+    explaining: "",
   };
 
   const handleChange = (field: keyof IQuizz, value: IQuizz[keyof IQuizz]) => {

@@ -153,11 +153,11 @@ export default function FlashCardDashboardClient() {
     }
 
     const rows = adminFlashCards.map((card) => ({
-      Topic: card.topic,
-      Word: card.word,
-      Meaning: card.meaning,
-      IPA: card.ipa,
-      Example: card.example,
+      topic: card.topic,
+      word: card.word,
+      meaning: card.meaning,
+      ipa: card.ipa,
+      example: card.example,
     }));
 
     const wb = XLSX.utils.book_new();
