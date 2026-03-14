@@ -25,7 +25,7 @@ declare global {
         question: string
         options: string[]
         answer: number
-        explaining?: string
+        explaining: string
     }
 
     interface IFlashCard {

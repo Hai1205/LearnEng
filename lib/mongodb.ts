@@ -30,7 +30,7 @@ if (process.env.NODE_ENV === "development") {
 
 export default clientPromise;
 
-const DB_NAME = "learnwordeng";
+const DB_NAME = "learneng";
 
 export async function getDb(): Promise<Db> {
     const client = await clientPromise;

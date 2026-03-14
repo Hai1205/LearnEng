@@ -15,7 +15,7 @@ interface AnswerRecord {
   answer: number;
 }
 
-interface QuizzResultScreenProps {
+interface QuizzResultProps {
   pool: IQuizz[];
   answers: AnswerRecord[];
   elapsed: number;
@@ -27,13 +27,13 @@ function fmtTime(s: number) {
   return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 }
 
-export default function QuizzResultScreen({
+export default function QuizzResult({
   pool,
   answers,
   elapsed,
   onRetry,
   onHome,
-}: QuizzResultScreenProps) {
+}: QuizzResultProps) {
   const [showReview, setShowReview] = useState(false);
 
   const score = answers.filter((a) => a.correct).length;

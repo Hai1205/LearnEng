@@ -1,17 +1,21 @@
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Noto_Sans, Noto_Serif } from "next/font/google";
 import "./globals.css";
 import "react-toastify/dist/ReactToastify.css";
 import { ReactNode } from "react";
 import LayoutClient from "@/components/commons/layout/LayoutClient";
 
-const inter = Inter({
+const notoSans = Noto_Sans({
   subsets: ["latin", "vietnamese"],
   variable: "--font-sans",
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const notoSerif = Noto_Serif({
   subsets: ["latin", "vietnamese"],
-  variable: "--font-mono",
+  variable: "--font-serif",
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata = {
@@ -28,7 +32,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="vi" suppressHydrationWarning className="overflow-hidden">
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased overflow-hidden h-screen`}
+        className={`${notoSans.variable} ${notoSerif.variable} font-sans antialiased overflow-hidden h-screen`}
       >
         <LayoutClient>{children}</LayoutClient>
       </body>

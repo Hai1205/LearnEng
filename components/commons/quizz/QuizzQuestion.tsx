@@ -11,7 +11,7 @@ const LEVEL_COLORS: Record<
   Khó: { color: "#ef4444", bg: "#fee2e2", emoji: "🔴" },
 };
 
-interface QuizzQuestionScreenProps {
+interface QuizzQuestionProps {
   question: IQuizz;
   idx: number;
   total: number;
@@ -29,7 +29,7 @@ function fmtTime(s: number) {
   return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 }
 
-export default function QuizzQuestionScreen({
+export default function QuizzQuestion({
   question,
   idx,
   total,
@@ -41,7 +41,7 @@ export default function QuizzQuestionScreen({
   onConfirm,
   onNext,
   onExit,
-}: QuizzQuestionScreenProps) {
+}: QuizzQuestionProps) {
   const lv = LEVEL_COLORS[question.level];
   const progress = ((idx + 1) / total) * 100;
 

@@ -3,9 +3,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAllQuizzesQuery } from "@/hooks/useQuizzApi";
 import { useSaveQuizzResultMutation } from "@/hooks/useQuizzResultApi";
-import QuizzHomeScreen from "./QuizzHomeScreen";
-import QuizzQuestionScreen from "./QuizzQuestionScreen";
-import QuizzResultScreen from "./QuizzResultScreen";
+import QuizzHome from "./QuizzHome";
+import QuizzQuestion from "./QuizzQuestion";
+import QuizzResult from "./QuizzResult";
 import QuizzSkeleton from "./QuizzSkeleton";
 
 interface AnswerRecord {
@@ -131,7 +131,7 @@ export default function QuizzClient() {
 
   if (screen === "home") {
     return (
-      <QuizzHomeScreen
+      <QuizzHome
         settings={settings}
         setSettings={setSettings}
         categories={categories}
@@ -145,7 +145,7 @@ export default function QuizzClient() {
 
   if (screen === "quiz" && pool[idx]) {
     return (
-      <QuizzQuestionScreen
+      <QuizzQuestion
         question={pool[idx]}
         idx={idx}
         total={pool.length}
@@ -162,7 +162,7 @@ export default function QuizzClient() {
   }
 
   return (
-    <QuizzResultScreen
+    <QuizzResult
       pool={pool}
       answers={answers}
       elapsed={elapsed}

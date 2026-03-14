@@ -4,8 +4,8 @@ import * as XLSX from "xlsx";
 
 export const dynamic = "force-dynamic";
 
-const REQUIRED_COLUMNS = ["category", "topic", "question", "opt1"];
-const OPTIONAL_COLUMNS = ["level", "opt2", "opt3", "opt4", "answer"];
+const REQUIRED_COLUMNS = ["category", "topic", "question", "option1"];
+const OPTIONAL_COLUMNS = ["level", "option2", "option3", "option4", "answer"];
 
 export async function POST(request: NextRequest) {
     try {
@@ -74,6 +74,7 @@ export async function POST(request: NextRequest) {
             question: string;
             options: string[];
             answer: number;
+            explaining: string;
             createdAt: Date;
             updatedAt: Date;
         }[] = [];
@@ -96,7 +97,7 @@ export async function POST(request: NextRequest) {
             // Collect options from opt1, opt2, opt3, opt4
             const options: string[] = [];
             for (let j = 1; j <= 4; j++) {
-                const optVal = String(row[`opt${j}`] ?? "").trim();
+                const optVal = String(row[`option${j}`] ?? "").trim();
                 if (optVal) options.push(optVal);
             }
 
@@ -110,6 +111,8 @@ export async function POST(request: NextRequest) {
                 !isNaN(ansRaw) && ansRaw >= 0 && ansRaw < options.length
                     ? ansRaw
                     : 0;
+            
+            const explaining = String(row.explaining ?? "").trim();
 
             validDocs.push({
                 category,
@@ -118,6 +121,7 @@ export async function POST(request: NextRequest) {
                 question,
                 options,
                 answer,
+                explaining,
                 createdAt: new Date(),
                 updatedAt: new Date(),
             });
@@ -144,6 +148,7 @@ export async function POST(request: NextRequest) {
             question: doc.question,
             options: doc.options,
             answer: doc.answer,
+            explaining: doc.explaining,
         }));
 
         return NextResponse.json(

@@ -13,7 +13,7 @@ interface QuizzSettings {
   shuffle: boolean;
 }
 
-interface QuizzHomeScreenProps {
+interface QuizzHomeProps {
   settings: QuizzSettings;
   setSettings: React.Dispatch<React.SetStateAction<QuizzSettings>>;
   categories: string[];
@@ -23,7 +23,7 @@ interface QuizzHomeScreenProps {
   isLoading: boolean;
 }
 
-export default function QuizzHomeScreen({
+export default function QuizzHome({
   settings,
   setSettings,
   categories,
@@ -31,7 +31,7 @@ export default function QuizzHomeScreen({
   questions,
   onStart,
   isLoading,
-}: QuizzHomeScreenProps) {
+}: QuizzHomeProps) {
   const minCount = 5;
   const filteredByCategoryTopic = questions.filter((q) => {
     if (settings.category !== "all" && q.category !== settings.category)

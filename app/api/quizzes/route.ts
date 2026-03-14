@@ -16,6 +16,7 @@ export async function GET() {
             question: doc.question ?? "",
             options: doc.options ?? [],
             answer: doc.answer ?? 0,
+            explaining: doc.explaining ?? "",
         }));
         return NextResponse.json({ data: { cards } });
     } catch (error) {
@@ -30,7 +31,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { category, topic, level, question, options, answer } = body;
+        const { category, topic, level, question, options, answer, explaining } = body;
 
         if (!category || !topic || !question || !options || !Array.isArray(options)) {
             return NextResponse.json(
@@ -59,6 +60,7 @@ export async function POST(request: NextRequest) {
             question,
             options,
             answer: typeof answer === "number" ? answer : 0,
+            explaining: explaining ?? "",
         };
 
         return NextResponse.json({ data: { card } }, { status: 201 });

@@ -70,35 +70,35 @@ npm run dev:turbo    # with Turbopack
 
 ### Home Page
 
-![Home Page](assets/images/home_page.png)
+![Home Page](public/images/home_page.png)
 
 ### Dashboard Page
 
-![Dashboard Page](assets/images/dashboard_page.png)
+![Dashboard Page](public/images/dashboard_page.png)
 
 ### Flash Card Dashboard Page
 
-![Flash Card Dashboard Page](assets/images/flash_card_dashboard_page.png)
+![Flash Card Dashboard Page](public/images/flash_card_dashboard_page.png)
 
 ### Quizz Dashboard Page
 
-![Quizz Dashboard Page](assets/images/quizz_dashboard_page.png)
+![Quizz Dashboard Page](public/images/quizz_dashboard_page.png)
 
 ### Flash Card Page
 
-![Flash Card Page](assets/images/flash_card_page.png)
+![Flash Card Page](public/images/flash_card_page.png)
 
 ### Quizz Home Page
 
-![Quizz Home Page](assets/images/quizz_controller_page.png)
+![Quizz Home Page](public/images/quizz_controller_page.png)
 
 ### Quizz Question Page
 
-![Quizz Question Page](assets/images/quizz_question_page.png)
+![Quizz Question Page](public/images/quizz_question_page.png)
 
 ### Quizz Result Page
 
-![Quizz Result Page](assets/images/quizz_result_page.png)
+![Quizz Result Page](public/images/quizz_result_page.png)
 
 ## Production
 
