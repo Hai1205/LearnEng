@@ -23,6 +23,7 @@ import {
   useImportFlashCardsMutation,
 } from "@/hooks/useFlashCardApi";
 import { toast } from "react-toastify";
+import * as XLSX from "xlsx";
 
 export type FlashCardFilterType = "topic";
 export interface IFlashCardFilter {
@@ -143,6 +144,29 @@ export default function FlashCardDashboardClient() {
     setActiveFilters(cardInitialFilters);
     setSearchQuery("");
     refetchFlashCards();
+  };
+
+  const handleExport = () => {
+    if (!adminFlashCards.length) {
+      toast.info("Không có dữ liệu flash card để export");
+      return;
+    }
+
+    const rows = adminFlashCards.map((card) => ({
+      Topic: card.topic,
+      Word: card.word,
+      Meaning: card.meaning,
+      IPA: card.ipa,
+      Example: card.example,
+    }));
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(rows);
+    XLSX.utils.book_append_sheet(wb, ws, "FlashCards");
+    XLSX.writeFile(
+      wb,
+      `flashcards_${new Date().toISOString().slice(0, 10)}.xlsx`,
+    );
   };
 
   const [openMenuFilters, setOpenMenuFilters] = useState(false);
@@ -326,6 +350,8 @@ export default function FlashCardDashboardClient() {
           setIsImportDialogOpen(true);
         }}
         importButtonText="Import Excel"
+        onExportClick={handleExport}
+        exportButtonText="Export Excel"
       />
 
       <CreateFlashCardDialog

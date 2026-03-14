@@ -8,7 +8,7 @@ export const Footer = () => {
           <div className="flex items-center gap-2">
             <FileText className="h-5 w-5 text-primary" />
             <span className="text-sm font-medium text-muted-foreground">
-              © 2026 LearnVolEng. All rights reserved.
+              © 2026 LearnEng. All rights reserved.
             </span>
           </div>
         </div>

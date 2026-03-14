@@ -23,6 +23,7 @@ import {
   useImportQuizzesMutation,
 } from "@/hooks/useQuizzApi";
 import { toast } from "react-toastify";
+import * as XLSX from "xlsx";
 
 export type QuizzFilterType = "category" | "topic" | "level";
 export interface IQuizzFilter {
@@ -152,6 +153,36 @@ export default function QuizzDashboardClient() {
     setActiveFilters(cardInitialFilters);
     setSearchQuery("");
     refetchQuizzes();
+  };
+
+  const handleExport = () => {
+    if (!adminQuizzes.length) {
+      toast.info("Không có dữ liệu quiz để export");
+      return;
+    }
+
+    const rows = adminQuizzes.map((quiz) => ({
+      Category: quiz.category,
+      Topic: quiz.topic,
+      Level: quiz.level,
+      Question: quiz.question,
+      OptionA: quiz.options?.[0] || "",
+      OptionB: quiz.options?.[1] || "",
+      OptionC: quiz.options?.[2] || "",
+      OptionD: quiz.options?.[3] || "",
+      Answer: quiz.answer,
+      Explaining:
+        (quiz as IQuizz & { explaining?: string; eplanning?: string })
+          .explaining ||
+        (quiz as IQuizz & { explaining?: string; eplanning?: string })
+          .eplanning ||
+        "",
+    }));
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(rows);
+    XLSX.utils.book_append_sheet(wb, ws, "Quizzes");
+    XLSX.writeFile(wb, `quizzes_${new Date().toISOString().slice(0, 10)}.xlsx`);
   };
 
   const [openMenuFilters, setOpenMenuFilters] = useState(false);
@@ -338,6 +369,8 @@ export default function QuizzDashboardClient() {
           setIsImportDialogOpen(true);
         }}
         importButtonText="Import Excel"
+        onExportClick={handleExport}
+        exportButtonText="Export Excel"
       />
 
       {/* Use consistent key to avoid hydration issues */}

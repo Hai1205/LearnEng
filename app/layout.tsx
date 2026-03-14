@@ -15,7 +15,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: "LearnVolEng - Master English Vocabulary with Flashcards and Quizzes",
+  title: "LearnEng - Master English Vocabulary with Flashcards and Quizzes",
   description: "Học từ vựng tiếng Anh hiệu quả với Flash Card và Quizz",
   icons: {
     icon: "/images/logo.png",

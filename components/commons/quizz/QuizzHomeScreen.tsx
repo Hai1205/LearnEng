@@ -3,15 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
-const LEVEL_CONFIG: Record<
-  string,
-  { color: string; bg: string; emoji: string }
-> = {
-  Dễ: { color: "text-emerald-500", bg: "bg-emerald-100", emoji: "🟢" },
-  "Trung bình": { color: "text-amber-500", bg: "bg-amber-100", emoji: "🟡" },
-  Khó: { color: "text-red-500", bg: "bg-red-100", emoji: "🔴" },
-};
+import { Minus, Plus } from "lucide-react";
 
 interface QuizzSettings {
   level: string;
@@ -26,9 +18,9 @@ interface QuizzHomeScreenProps {
   setSettings: React.Dispatch<React.SetStateAction<QuizzSettings>>;
   categories: string[];
   topics: string[];
+  questions: IQuizz[];
   onStart: () => void;
   isLoading: boolean;
-  totalQuestions: number;
 }
 
 export default function QuizzHomeScreen({
@@ -36,10 +28,30 @@ export default function QuizzHomeScreen({
   setSettings,
   categories,
   topics,
+  questions,
   onStart,
   isLoading,
-  totalQuestions,
 }: QuizzHomeScreenProps) {
+  const minCount = 5;
+  const filteredByCategoryTopic = questions.filter((q) => {
+    if (settings.category !== "all" && q.category !== settings.category)
+      return false;
+    if (settings.topic !== "all" && q.topic !== settings.topic) return false;
+    return true;
+  });
+  const maxCount = Math.max(filteredByCategoryTopic.length, minCount);
+
+  const setCount = (next: number) => {
+    const clamped = Math.min(maxCount, Math.max(minCount, next));
+    setSettings((s) => ({ ...s, count: clamped }));
+  };
+
+  useEffect(() => {
+    if (settings.count > maxCount) {
+      setSettings((s) => ({ ...s, count: maxCount }));
+    }
+  }, [maxCount, settings.count, setSettings]);
+
   return (
     <div className="min-h-screen bg-linear-to-br from-[#0d1117] via-[#161b22] to-[#0d1117] font-serif flex items-center justify-center p-5">
       <div className="bg-white/4 backdrop-blur-2xl border border-white/10 rounded-[28px] p-10 max-w-125 w-full text-white shadow-[0_24px_80px_rgba(0,0,0,0.5)]">
@@ -118,26 +130,51 @@ export default function QuizzHomeScreen({
             {/* Count */}
             <div>
               <label className="text-[11px] text-white/40 uppercase tracking-[1.5px] block mb-2.5">
-                Số câu:{" "}
-                <span className="text-sky-400 font-bold">{settings.count}</span>
+                Số câu
               </label>
+              <div className="mb-3 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCount(settings.count - 5)}
+                  className="h-10 w-10 rounded-[10px] border-[1.5px] border-white/12 bg-white/6 text-white/75 transition-colors hover:border-white/25 hover:text-white"
+                  aria-label="Giảm số câu"
+                >
+                  <Minus className="mx-auto h-4 w-4" />
+                </button>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min={minCount}
+                  max={maxCount}
+                  value={settings.count}
+                  onChange={(e) => {
+                    const v = Number(e.target.value);
+                    if (Number.isNaN(v)) return;
+                    setCount(v);
+                  }}
+                  className="h-10 flex-1 rounded-[10px] border-[1.5px] border-white/12 bg-white/6 px-3 text-center text-[14px] font-semibold text-sky-300 outline-none transition-colors focus:border-sky-400"
+                />
+                <button
+                  type="button"
+                  onClick={() => setCount(settings.count + 5)}
+                  className="h-10 w-10 rounded-[10px] border-[1.5px] border-white/12 bg-white/6 text-white/75 transition-colors hover:border-white/25 hover:text-white"
+                  aria-label="Tăng số câu"
+                >
+                  <Plus className="mx-auto h-4 w-4" />
+                </button>
+              </div>
               <input
                 type="range"
-                min={5}
-                max={Math.max(totalQuestions, 5)}
+                min={minCount}
+                max={maxCount}
                 step={5}
                 value={settings.count}
-                onChange={(e) =>
-                  setSettings((s) => ({
-                    ...s,
-                    count: parseInt(e.target.value),
-                  }))
-                }
+                onChange={(e) => setCount(parseInt(e.target.value))}
                 className="w-full accent-sky-400"
               />
               <div className="flex justify-between text-[11px] text-white/25 mt-1">
-                <span>5</span>
-                <span>{Math.max(totalQuestions, 5)}</span>
+                <span>{minCount}</span>
+                <span>{maxCount}</span>
               </div>
             </div>
 

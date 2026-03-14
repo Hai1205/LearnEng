@@ -163,6 +163,17 @@ export default function QuizzQuestionScreen({
             );
           })}
         </div>
+
+        {confirmed && question.explaining?.trim() && (
+          <div className="mt-5 rounded-xl border border-sky-400/25 bg-sky-400/8 p-4">
+            <p className="mb-1 text-xs font-bold tracking-wide text-sky-300">
+              Giải thích
+            </p>
+            <p className="text-sm leading-relaxed text-white/85">
+              {question.explaining}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Action button */}

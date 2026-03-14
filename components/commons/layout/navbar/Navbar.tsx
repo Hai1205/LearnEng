@@ -1,22 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Sun, Moon } from "lucide-react";
 import { NavbarLogo } from "./NavbarLogo";
 import { NavbarLinks } from "./NavbarLinks";
-import { NavbarSearch } from "./NavbarSearch";
-import { NavbarUserMenu } from "./NavbarUserMenu";
-import { NavbarAuthButtons } from "./NavbarAuthButtons";
-import { NavbarMobileMenu } from "./NavbarMobileMenu";
 
 export function Navbar() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
 
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => setIsHydrated(true), []);

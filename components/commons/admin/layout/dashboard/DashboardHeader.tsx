@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Plus, Upload } from "lucide-react";
+import { Download, Plus, Upload } from "lucide-react";
 import { ReactNode } from "react";
 
 interface DashboardHeaderProps {
@@ -8,6 +8,8 @@ interface DashboardHeaderProps {
   createButtonText?: string;
   onImportClick?: () => void;
   importButtonText?: string;
+  onExportClick?: () => void;
+  exportButtonText?: string;
   children?: ReactNode;
 }
 
@@ -17,6 +19,8 @@ export const DashboardHeader = ({
   createButtonText = "Create",
   onImportClick,
   importButtonText = "Import",
+  onExportClick,
+  exportButtonText = "Export",
   children,
 }: DashboardHeaderProps) => {
   return (
@@ -41,6 +45,17 @@ export const DashboardHeader = ({
           >
             <Upload className="h-4 w-4" />
             {importButtonText}
+          </Button>
+        )}
+        {onExportClick && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9 gap-2 px-4 border-secondary/60 text-secondary hover:bg-secondary/10 shadow-md transition-all duration-200 hover:scale-105"
+            onClick={onExportClick}
+          >
+            <Download className="h-4 w-4" />
+            {exportButtonText}
           </Button>
         )}
         {onCreateClick && (

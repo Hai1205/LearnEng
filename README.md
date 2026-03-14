@@ -1,4 +1,4 @@
-# LearnVolEng
+# LearnEng
 
 English vocabulary learning platform built with Next.js, MongoDB, and TypeScript — featuring flash cards, quizzes, and progress tracking.
 
@@ -48,8 +48,8 @@ English vocabulary learning platform built with Next.js, MongoDB, and TypeScript
 
 ```bash
 # Clone the repository
-git clone https://github.com/Hai1205/LearnVolEng.git
-cd LearnVolEng
+git clone https://github.com/Hai1205/LearnEng.git
+cd LearnEng
 
 # Install dependencies
 npm install
@@ -66,7 +66,41 @@ npm run dev          # http://localhost:3000
 npm run dev:turbo    # with Turbopack
 ```
 
-### Production
+## Artwork
+
+### Home Page
+
+![Home Page](assets/images/home_page.png)
+
+### Dashboard Page
+
+![Dashboard Page](assets/images/dashboard_page.png)
+
+### Flash Card Dashboard Page
+
+![Flash Card Dashboard Page](assets/images/flash_card_dashboard_page.png)
+
+### Quizz Dashboard Page
+
+![Quizz Dashboard Page](assets/images/quizz_dashboard_page.png)
+
+### Flash Card Page
+
+![Flash Card Page](assets/images/flash_card_page.png)
+
+### Quizz Home Page
+
+![Quizz Home Page](assets/images/quizz_controller_page.png)
+
+### Quizz Question Page
+
+![Quizz Question Page](assets/images/quizz_question_page.png)
+
+### Quizz Result Page
+
+![Quizz Result Page](assets/images/quizz_result_page.png)
+
+## Production
 
 ```bash
 npm run build
@@ -76,8 +110,8 @@ npm run start
 ### Docker
 
 ```bash
-docker build -t learnvoleng .
-docker run -p 3000:3000 --env-file .env learnvoleng
+docker build -t LearnEng .
+docker run -p 3000:3000 --env-file .env LearnEng
 ```
 
 ## Project Structure

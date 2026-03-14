@@ -40,6 +40,11 @@ export const QuizzFilter = ({
 
   const filterSections: QuizzFilterSection[] = [
     {
+      key: "level",
+      label: "Level",
+      options: levelSelection,
+    },
+    {
       key: "category",
       label: "Category",
       options: categorySelection,
@@ -48,11 +53,6 @@ export const QuizzFilter = ({
       key: "topic",
       label: "Topic",
       options: topicSelection,
-    },
-    {
-      key: "level",
-      label: "Level",
-      options: levelSelection,
     },
   ];
 

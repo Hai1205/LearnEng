@@ -1,6 +1,5 @@
+import { MONGO_URI } from "@/services/constants";
 import { MongoClient, Db } from "mongodb";
-
-const MONGO_URI = process.env.MONGODB_URI || process.env.NEXT_PUBLIC_MONGO_URI || "";
 
 if (!MONGO_URI) {
     throw new Error("Please define MONGODB_URI in your environment variables");

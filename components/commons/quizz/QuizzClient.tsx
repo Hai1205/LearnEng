@@ -136,9 +136,9 @@ export default function QuizzClient() {
         setSettings={setSettings}
         categories={categories}
         topics={topics}
+        questions={allQuestions}
         onStart={startQuiz}
         isLoading={false}
-        totalQuestions={allQuestions.length}
       />
     );
   }

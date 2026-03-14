@@ -2,9 +2,16 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, X } from "lucide-react";
+import { ChevronDown, Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface QuizzFormProps {
@@ -75,33 +82,55 @@ export const QuizzForm = ({ data, onChange }: QuizzFormProps) => {
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="form-topic" className="text-sm font-medium">
-          Topic <span className="text-destructive">*</span>
-        </Label>
-        <Input
-          id="form-topic"
-          type="topic"
-          value={data?.topic || ""}
-          onChange={(e) => onChange("topic", e.target.value)}
-          className="bg-background/50 border-border/50 focus:border-primary transition-colors"
-          placeholder="Enter topic"
-          required
-        />
-      </div>
+      <div className="grid grid-cols-5 gap-5">
+        <div className="col-span-3 space-y-2">
+          <Label htmlFor="form-topic" className="text-sm font-medium">
+            Topic <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            id="form-topic"
+            type="text"
+            value={data?.topic || ""}
+            onChange={(e) => onChange("topic", e.target.value)}
+            className="bg-background/50 border-border/50 focus:border-primary transition-colors"
+            placeholder="Enter topic"
+            required
+          />
+        </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="form-level" className="text-sm font-medium">
-          Level
-        </Label>
-        <Input
-          id="form-level"
-          type="text"
-          value={data?.level || ""}
-          onChange={(e) => onChange("level", e.target.value)}
-          className="bg-background/50 border-border/50 focus:border-primary transition-colors"
-          placeholder="Enter Level"
-        />
+        <div className="col-span-2 space-y-2">
+          <Label htmlFor="form-level" className="text-sm font-medium">
+            Level
+          </Label>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                id="form-level"
+                type="button"
+                variant="outline"
+                className="h-10 w-full justify-between border-border/50 bg-background/50 px-3 text-sm font-normal hover:bg-background/70"
+              >
+                <span>{data?.level || "Chọn mức độ"}</span>
+                <ChevronDown className="h-4 w-4 opacity-70" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="start"
+              className="w-(--radix-dropdown-menu-trigger-width)"
+            >
+              <DropdownMenuRadioGroup
+                value={data?.level || ""}
+                onValueChange={(value) => onChange("level", value)}
+              >
+                {["Dễ", "Trung bình", "Khó"].map((lv) => (
+                  <DropdownMenuRadioItem key={lv} value={lv}>
+                    {lv}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       <div className="flex gap-4">
@@ -191,6 +220,21 @@ export const QuizzForm = ({ data, onChange }: QuizzFormProps) => {
             Not addition yet.
           </div>
         )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="form-explaining" className="text-sm font-medium">
+          Explaining
+        </Label>
+        <Input
+          id="form-explaining"
+          type="explaining"
+          value={data?.explaining || ""}
+          onChange={(e) => onChange("explaining", e.target.value)}
+          className="bg-background/50 border-border/50 focus:border-primary transition-colors"
+          placeholder="Enter explaining"
+          required
+        />
       </div>
     </div>
   );

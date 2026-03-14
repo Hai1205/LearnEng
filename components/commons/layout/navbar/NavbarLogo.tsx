@@ -5,7 +5,7 @@ export const NavbarLogo = () => (
   <Link href="/" className="flex items-center gap-2 font-bold text-xl">
     <FileText className="h-6 w-6 text-primary" />
     <span className="bg-linear-to-br from-primary to-secondary bg-clip-text text-transparent">
-      LearnVolEng
+      LearnEng
     </span>
   </Link>
 );
