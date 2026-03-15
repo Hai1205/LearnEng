@@ -75,7 +75,11 @@ export const QuizzTable = ({
       header: "Question",
       accessor: (card: IQuizz) => (
         <div className="inline-flex items-center justify-center gap-2">
-          <span className="capitalize">{card.question}</span>
+          <span title={card.question}>
+            {card.question.length > 50
+              ? card.question.substring(0, 50) + "..."
+              : card.question}
+          </span>
         </div>
       ),
     },

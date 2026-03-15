@@ -45,6 +45,17 @@ declare global {
         answeredAt: string
     }
 
+    interface IQuizzHistoryItem extends IQuizzResult {
+        category: string
+        topic: string
+        level: string
+        question: string
+        explaining: string
+        correctAnswer: number
+        selectedAnswerText: string
+        correctAnswerText: string
+    }
+
     interface IWordProgress {
         id: string
         flashCardId: string

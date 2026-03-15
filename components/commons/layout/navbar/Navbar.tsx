@@ -20,6 +20,7 @@ export function Navbar() {
     { href: "/", label: "Home" },
     { href: "/flash-card", label: "Flash Card" },
     { href: "/quizz", label: "Quizz" },
+    { href: "/history", label: "History" },
     { href: "/admin", label: "Admin Dashboard" },
   ];
 
