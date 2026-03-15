@@ -24,11 +24,11 @@ export const AdminSidebar = ({
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
     {
-      icon: BookOpen,
+      icon: Brain,
       label: "Flash Card Dashboard",
       href: "/admin/flash-card-dashboard",
     },
-    { icon: Brain, label: "Quizz Dashboard", href: "/admin/quizz-dashboard" },
+    { icon: BookOpen, label: "Quizz Dashboard", href: "/admin/quizz-dashboard" },
   ];
 
   return (

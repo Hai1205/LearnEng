@@ -34,9 +34,9 @@ export const HeroSection = () => {
 
       <div className="flex flex-col gap-5 sm:flex-row">
         <Link href="/flash-card">
-          <div className="group relative w-64 h-36 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/30 hover:border-primary/60 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(56,189,248,0.15)] cursor-pointer flex flex-col items-center justify-center gap-3">
+          <div className="group relative w-64 h-36 rounded-2xl bg-linear-to-br from-primary/20 to-primary/5 border border-primary/30 hover:border-primary/60 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(56,189,248,0.15)] cursor-pointer flex flex-col items-center justify-center gap-3">
             <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/15 group-hover:bg-primary/25 transition-colors duration-300">
-              <BookOpen className="w-6 h-6 text-primary" />
+              <Brain className="w-6 h-6 text-primary" />
             </div>
             <span className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors duration-300">
               Flash Card
@@ -48,9 +48,9 @@ export const HeroSection = () => {
         </Link>
 
         <Link href="/quizz">
-          <div className="group relative w-64 h-36 rounded-2xl bg-gradient-to-br from-secondary/20 to-secondary/5 border border-secondary/30 hover:border-secondary/60 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(129,140,248,0.15)] cursor-pointer flex flex-col items-center justify-center gap-3">
+          <div className="group relative w-64 h-36 rounded-2xl bg-linear-to-br from-secondary/20 to-secondary/5 border border-secondary/30 hover:border-secondary/60 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(129,140,248,0.15)] cursor-pointer flex flex-col items-center justify-center gap-3">
             <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-secondary/15 group-hover:bg-secondary/25 transition-colors duration-300">
-              <Brain className="w-6 h-6 text-secondary" />
+              <BookOpen className="w-6 h-6 text-secondary" />
             </div>
             <span className="text-lg font-semibold text-foreground group-hover:text-secondary transition-colors duration-300">
               Quizz

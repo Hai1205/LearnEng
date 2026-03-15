@@ -1,4 +1,4 @@
-import { UserCog } from "lucide-react";
+import { Brain } from "lucide-react";
 import { AdminDialog } from "../layout/dialog/AdminDialog";
 import { FlashCardForm } from "./FlashCardForm";
 
@@ -23,7 +23,7 @@ export const CreateFlashCardDialog = ({
       onOpenChange={onOpenChange}
       title="Create Flash Card"
       description="Create flash card information"
-      icon={UserCog}
+      icon={Brain}
       onSubmit={onFlashCardCreated}
       isCreateDialog={true}
       className="max-w-lg"

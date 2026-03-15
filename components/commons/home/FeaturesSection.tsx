@@ -9,7 +9,7 @@ export const FeaturesSection = () => {
 
   const features = [
     {
-      icon: BookOpen,
+      icon: Brain,
       title: "Flash Card thông minh",
       description:
         "Học từ vựng bằng thẻ lật trực quan với phiên âm, ví dụ và phát âm tự động. Theo dõi tiến độ từng từ một.",
@@ -17,7 +17,7 @@ export const FeaturesSection = () => {
       delay: "100ms",
     },
     {
-      icon: Brain,
+      icon: BookOpen,
       title: "Quizz luyện tập",
       description:
         "Kiểm tra kiến thức với câu hỏi trắc nghiệm đa dạng. Lọc theo chủ đề, độ khó và xáo trộn câu hỏi để luyện tập hiệu quả.",

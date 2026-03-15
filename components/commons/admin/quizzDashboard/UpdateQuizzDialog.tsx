@@ -1,4 +1,4 @@
-import { UserCog } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { AdminDialog } from "../layout/dialog/AdminDialog";
 import { QuizzForm } from "./QuizzForm";
 
@@ -23,7 +23,7 @@ export const UpdateQuizzDialog = ({
       onOpenChange={onOpenChange}
       title="Edit Quizz"
       description="Update quizz information"
-      icon={UserCog}
+      icon={BookOpen}
       onSubmit={onQuizzUpdated}
       isCreateDialog={false}
       className="max-w-lg"

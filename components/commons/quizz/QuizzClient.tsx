@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAllQuizzesQuery } from "@/hooks/useQuizzApi";
 import { useSaveQuizzResultMutation } from "@/hooks/useQuizzResultApi";
-import QuizzHome from "./QuizzHome";
+import { useQuizzStore } from "@/stores/quizzStore";
 import QuizzQuestion from "./QuizzQuestion";
 import QuizzResult from "./QuizzResult";
 import QuizzSkeleton from "./QuizzSkeleton";
+import QuizzController from "./QuizzController";
 
 interface AnswerRecord {
   qid: string;
@@ -27,6 +28,12 @@ function shuffle<T>(arr: T[]): T[] {
 export default function QuizzClient() {
   const { data: quizzData, isLoading } = useAllQuizzesQuery();
   const saveResult = useSaveQuizzResultMutation();
+  const {
+    selectedCategories,
+    selectedTopics,
+    setSelectedCategories,
+    setSelectedTopics,
+  } = useQuizzStore();
 
   const allQuestions = useMemo(() => quizzData?.data?.cards ?? [], [quizzData]);
 
@@ -38,8 +45,8 @@ export default function QuizzClient() {
   const [screen, setScreen] = useState<"home" | "quiz" | "result">("home");
   const [settings, setSettings] = useState({
     level: "all",
-    category: "all",
-    topic: "all",
+    category: selectedCategories,
+    topic: selectedTopics,
     count: 20,
     shuffle: true,
   });
@@ -50,20 +57,7 @@ export default function QuizzClient() {
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
   const [streak, setStreak] = useState(0);
   const [elapsed, setElapsed] = useState(0);
-
-  const topics = useMemo(
-    () =>
-      settings.category === "all"
-        ? []
-        : [
-            ...new Set(
-              allQuestions
-                .filter((q) => q.category === settings.category)
-                .map((q) => q.topic),
-            ),
-          ].sort(),
-    [allQuestions, settings.category],
-  );
+  const didRestoreFromStore = useRef(false);
 
   useEffect(() => {
     if (screen !== "quiz") return;
@@ -71,14 +65,36 @@ export default function QuizzClient() {
     return () => clearInterval(t);
   }, [screen]);
 
+  useEffect(() => {
+    setSelectedCategories(settings.category);
+    setSelectedTopics(settings.topic);
+  }, [
+    settings.category,
+    settings.topic,
+    setSelectedCategories,
+    setSelectedTopics,
+  ]);
+
+  useEffect(() => {
+    if (didRestoreFromStore.current) return;
+
+    if (selectedCategories.length > 0 || selectedTopics.length > 0) {
+      didRestoreFromStore.current = true;
+      setSettings((prev) => ({
+        ...prev,
+        category: selectedCategories,
+        topic: selectedTopics,
+      }));
+    }
+  }, [selectedCategories, selectedTopics]);
+
   const startQuiz = useCallback(() => {
     let filtered = allQuestions;
     if (settings.level !== "all")
       filtered = filtered.filter((q) => q.level === settings.level);
-    if (settings.category !== "all")
-      filtered = filtered.filter((q) => q.category === settings.category);
-    if (settings.topic !== "all")
-      filtered = filtered.filter((q) => q.topic === settings.topic);
+    filtered = filtered.filter((q) => settings.category.includes(q.category));
+    if (settings.topic.length > 0)
+      filtered = filtered.filter((q) => settings.topic.includes(q.topic));
     const count = Math.min(settings.count, filtered.length);
     const chosen = settings.shuffle
       ? shuffle(filtered).slice(0, count)
@@ -131,11 +147,10 @@ export default function QuizzClient() {
 
   if (screen === "home") {
     return (
-      <QuizzHome
+      <QuizzController
         settings={settings}
         setSettings={setSettings}
         categories={categories}
-        topics={topics}
         questions={allQuestions}
         onStart={startQuiz}
         isLoading={false}

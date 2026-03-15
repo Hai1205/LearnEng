@@ -2,11 +2,15 @@ import { createStore, EStorageType, IBaseStore } from "@/lib/initialStore";
 
 export interface IQuizzStore extends IBaseStore {
 	adminQuizzes: IQuizz[];
+	selectedCategories: string[];
+	selectedTopics: string[];
 
 	setAdminQuizzes: (cards: IQuizz[]) => void;
 	removeFromAdminQuizzes: (cardId: string) => void;
 	addToAdminQuizzes: (card: IQuizz) => void;
 	updateInAdminQuizzes: (card: IQuizz) => void;
+	setSelectedCategories: (categories: string[]) => void;
+	setSelectedTopics: (topics: string[]) => void;
 
 	reset: () => void;
 }
@@ -14,6 +18,8 @@ export interface IQuizzStore extends IBaseStore {
 const storeName = "quizz";
 const initialState = {
 	adminQuizzes: [],
+	selectedCategories: [],
+	selectedTopics: [],
 };
 
 export const useQuizzStore = createStore<IQuizzStore>(
@@ -40,6 +46,14 @@ export const useQuizzStore = createStore<IQuizzStore>(
 					c.id === card.id ? card : c
 				),
 			});
+		},
+
+		setSelectedCategories: (categories: string[]): void => {
+			set({ selectedCategories: categories });
+		},
+
+		setSelectedTopics: (topics: string[]): void => {
+			set({ selectedTopics: topics });
 		},
 
 		reset: () => {

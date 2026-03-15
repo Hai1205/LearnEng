@@ -147,7 +147,7 @@ export default function QuizzResult({
         {/* By Category */}
         <div className="bg-white/3 border border-white/7 rounded-2xl p-5 mb-3.5">
           <h3 className="text-white/35 m-0 mb-3.5 text-[11px] uppercase tracking-[2px]">
-            Theo động từ
+            Theo chủ đề
           </h3>
           <div className="grid grid-cols-2 gap-2">
             {Object.entries(byCat).map(([category, d]) => {
@@ -215,6 +215,16 @@ export default function QuizzResult({
                         Đúng: {LABELS[a.answer]} – {q.options[a.answer]}
                       </span>
                     </div>
+                    {q.explaining?.trim() && (
+                      <div className="mt-2.5 rounded-lg border border-sky-400/20 bg-sky-400/8 px-2.5 py-2">
+                        <p className="mb-1 text-[11px] font-bold tracking-wide text-sky-300">
+                          Giải thích
+                        </p>
+                        <p className="text-xs leading-relaxed text-white/80">
+                          {q.explaining}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 );
               })
