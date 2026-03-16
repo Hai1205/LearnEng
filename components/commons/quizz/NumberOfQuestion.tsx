@@ -55,7 +55,7 @@ export const NumberOfQuestion = ({
         type="range"
         min={minCount}
         max={maxCount}
-        step={5}
+        step={1}
         value={count}
         onChange={(e) => onSetCount(parseInt(e.target.value, 10))}
         className="w-full accent-sky-400"

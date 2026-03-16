@@ -94,7 +94,7 @@ export default function QuizzResult({
           <div className="text-[38px] font-bold text-white mb-1">
             {score}/{pool.length}
           </div>
-          <div className="text-white/40 mb-4 text-sm">câu đúng • {pct}%</div>
+          <div className="text-white/40 mb-4 text-sm">Tỷ lệ đúng • {pct}%</div>
           <div className="flex justify-center gap-6 text-white/40 text-xs tracking-wider">
             <span>⏱ {fmtTime(elapsed)}</span>
             <span>📝 {pool.length} câu</span>
@@ -200,7 +200,7 @@ export default function QuizzResult({
                   >
                     <p className="text-white/75 m-0 mb-2 text-[13px] leading-relaxed">
                       <span className="text-red-500/80 font-bold">
-                        #{q.id.slice(-6)} [{q.category}]
+                        [{q.category}]
                       </span>{" "}
                       {q.question}
                     </p>

@@ -2,6 +2,7 @@ import { DataTable } from "../adminTable/DataTable";
 import { Pencil, Trash2 } from "lucide-react";
 import { PaginationData } from "@/components/commons/layout/pagination/PaginationControls";
 import { SpeakButton } from "./SpeakButton";
+import { MobileFlashCardTable } from "./MobileFlashCardTable";
 
 interface FlashCardTableProps {
   cards: IFlashCard[];
@@ -22,61 +23,6 @@ export const FlashCardTable = ({
   onPageChange,
   showPagination = false,
 }: FlashCardTableProps) => {
-  const renderMobileCard = (card: IFlashCard, index: number) => {
-    const no = paginationData
-      ? (paginationData.currentPage - 1) * paginationData.pageSize + index + 1
-      : index + 1;
-
-    return (
-      <div className="space-y-2">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            No
-          </span>
-          <span className="text-sm font-medium">{no}</span>
-        </div>
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Topic
-          </span>
-          <span className="max-w-[65%] truncate text-right text-sm capitalize">
-            {card.topic}
-          </span>
-        </div>
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Word
-          </span>
-          <span className="max-w-[65%] truncate text-right text-sm capitalize">
-            {card.word}
-          </span>
-        </div>
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Meaning
-          </span>
-          <span className="max-w-[65%] truncate text-right text-sm capitalize">
-            {card.meaning}
-          </span>
-        </div>
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            IPA
-          </span>
-          <span className="max-w-[65%] truncate text-right text-sm">
-            {card.ipa}
-          </span>
-        </div>
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Voice
-          </span>
-          <SpeakButton word={card.word} />
-        </div>
-      </div>
-    );
-  };
-
   const columns = [
     {
       header: "No",
@@ -155,7 +101,13 @@ export const FlashCardTable = ({
       columns={columns}
       actions={actions}
       getRowKey={(card) => card.id}
-      mobileCardRenderer={renderMobileCard}
+      mobileCardRenderer={(item: IFlashCard, index: number) => (
+        <MobileFlashCardTable
+          item={item}
+          index={index}
+          paginationData={paginationData}
+        />
+      )}
       emptyMessage="No cards found."
       showPagination={showPagination}
       paginationData={paginationData}

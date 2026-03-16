@@ -113,7 +113,7 @@ export default function FlashCardDashboardClient() {
   }, [adminFlashCards, searchQuery, activeFilters]);
 
   // Paginate filtered adminFlashCards
-  const paginatedFlashCards = filteredFlashCards.slice(
+  const paginatedItems = filteredFlashCards.slice(
     (paginationState.page - 1) * paginationState.pageSize,
     paginationState.page * paginationState.pageSize,
   );
@@ -419,7 +419,7 @@ export default function FlashCardDashboardClient() {
           </CardHeader>
 
           <FlashCardTable
-            cards={paginatedFlashCards}
+            cards={paginatedItems}
             isLoading={false}
             onUpdate={onUpdate}
             onDelete={onDelete}

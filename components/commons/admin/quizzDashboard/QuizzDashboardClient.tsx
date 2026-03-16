@@ -116,12 +116,18 @@ export default function QuizzDashboardClient() {
       );
     }
 
+    if (activeFilters.level.length > 0) {
+      results = results.filter((card) =>
+        activeFilters.level.includes(card.level || ""),
+      );
+    }
+
     setFilteredQuizzes(results);
     setCurrentPage(1);
   }, [adminQuizzes, searchQuery, activeFilters]);
 
   // Paginate filtered quizzes
-  const paginatedQuizzes = filteredQuizzes.slice(
+  const paginatedItems = filteredQuizzes.slice(
     (paginationState.page - 1) * paginationState.pageSize,
     paginationState.page * paginationState.pageSize,
   );
@@ -437,7 +443,7 @@ export default function QuizzDashboardClient() {
           </CardHeader>
 
           <QuizzTable
-            cards={paginatedQuizzes}
+            cards={paginatedItems}
             isLoading={false}
             onUpdate={onUpdate}
             onDelete={onDelete}
