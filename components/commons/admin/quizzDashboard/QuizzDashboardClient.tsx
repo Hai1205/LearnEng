@@ -359,14 +359,11 @@ export default function QuizzDashboardClient() {
           setData(defaultQuizz);
           setIsCreateQuizzOpen(true);
         }}
-        createButtonText="Create Quizz"
         onImportClick={() => {
           setDroppedFile(null);
           setIsImportDialogOpen(true);
         }}
-        importButtonText="Import Excel"
         onExportClick={handleExport}
-        exportButtonText="Export Excel"
       />
 
       {/* Use consistent key to avoid hydration issues */}
@@ -403,10 +400,10 @@ export default function QuizzDashboardClient() {
       <div className="space-y-4">
         <Card className="border-border/50 shadow-lg bg-linear-to-br from-card to-card/80 backdrop-blur-sm">
           <CardHeader className="pb-4 border-b border-border/30">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <CardTitle />
 
-              <div className="flex items-center gap-3">
+              <div className="flex w-full sm:w-auto flex-wrap items-center gap-2 sm:gap-3">
                 <TableSearch
                   searchQuery={searchQuery}
                   setSearchQuery={setSearchQuery}

@@ -8,15 +8,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { MoreHorizontal } from "lucide-react";
 import { TableSkeleton } from "./TableSkeleton";
 import { cn } from "@/lib/utils";
@@ -24,7 +15,7 @@ import {
   PaginationControls,
   PaginationData,
 } from "@/components/commons/layout/pagination/PaginationControls";
-import { ComponentType, ReactNode } from "react";
+import { ComponentType, ReactNode, useRef } from "react";
 
 interface DataTableProps<T> {
   data: T[];
@@ -46,6 +37,9 @@ interface DataTableProps<T> {
   paginationData?: PaginationData;
   onPageChange?: (page: number) => void;
   showPagination?: boolean;
+  mobileTableMinWidthPx?: number;
+  getRowKey?: (item: T, index: number) => string | number;
+  mobileCardRenderer?: (item: T, index: number) => ReactNode;
 }
 
 export function DataTable<T>({
@@ -58,119 +52,219 @@ export function DataTable<T>({
   paginationData,
   onPageChange,
   showPagination = false,
+  mobileTableMinWidthPx = 820,
+  getRowKey,
+  mobileCardRenderer,
 }: DataTableProps<T>) {
+  const tableScrollRef = useRef<HTMLDivElement>(null);
+
   return (
-    <div className="flex flex-col gap-4">
-      <ScrollArea className="h-[calc(100vh-280px)] w-full rounded-xl bg-linear-to-br from-card to-card/80 backdrop-blur-sm border border-border/50 shadow-lg">
-        <CardContent>
-          <Table className="border-collapse [&_tr]:border-b [&_tr]:border-border/30">
-            <TableHeader>
-              <TableRow className="border-b-2 border-primary/20 bg-linear-to-br from-primary/5 to-secondary/5 hover:from-primary/10 hover:to-secondary/10 transition-colors">
-                {columns.map((column, index) => (
-                  <TableHead
-                    key={index}
-                    className={`text-center font-bold text-foreground/90 ${
-                      column.className || ""
-                    }`}
-                  >
-                    {column.header}
-                  </TableHead>
-                ))}
-                {actions && actions.length > 0 && (
-                  <TableHead className="text-right font-bold text-foreground/90">
-                    Activities
-                  </TableHead>
-                )}
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={columns.length + (actions ? 1 : 0)}>
-                    <TableSkeleton />
-                  </TableCell>
-                </TableRow>
-              ) : data && data.length > 0 ? (
-                data.map((item, index) => (
-                  <TableRow
-                    key={index}
-                    className={cn(
-                      "transition-all duration-200 hover:bg-linear-to-br hover:from-primary/5 hover:to-secondary/5",
-                      onRowClick &&
-                        "cursor-pointer hover:shadow-md hover:shadow-primary/10",
-                    )}
-                    onClick={() => onRowClick?.(item)}
-                  >
-                    {columns.map((column, colIndex) => (
-                      <TableCell
-                        key={colIndex}
-                        className={`text-center ${column.className || ""}`}
-                      >
-                        {column.accessor(item, index)}
-                      </TableCell>
-                    ))}
-                    {actions && actions.length > 0 && (
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg transition-all hover:scale-110"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <MoreHorizontal className="h-4 w-4 text-foreground/70 hover:text-primary" />
-                            </Button>
-                          </DropdownMenuTrigger>
-
-                          <DropdownMenuContent
-                            align="end"
-                            className="bg-card/95 backdrop-blur-sm border border-border/50 shadow-xl"
-                          >
-                            <DropdownMenuLabel className="text-foreground font-semibold bg-linear-to-br from-primary/10 to-secondary/10">
-                              Activities
-                            </DropdownMenuLabel>
-
-                            <DropdownMenuSeparator className="bg-border/50" />
-
-                            {actions.map((action, actionIndex) => (
-                              <DropdownMenuItem
-                                key={actionIndex}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  action.onClick(item);
-                                }}
-                                className={`text-foreground cursor-pointer hover:bg-linear-to-br hover:from-primary/10 hover:to-secondary/10 hover:text-primary focus:bg-linear-to-br focus:from-primary/10 focus:to-secondary/10 active:bg-primary/20 transition-all duration-200 rounded-lg font-medium ${
-                                  action.className || ""
-                                }`}
-                              >
-                                {action.icon && (
-                                  <action.icon className="mr-2 h-4 w-4" />
-                                )}
-                                {action.label}
-                              </DropdownMenuItem>
-                            ))}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length + (actions ? 1 : 0)}
-                    className="text-center"
-                  >
-                    {emptyMessage}
-                  </TableCell>
-                </TableRow>
+    <div className="flex flex-col gap-3">
+      <div className="md:hidden space-y-2">
+        {isLoading ? (
+          <div className="rounded-lg border border-border/60 bg-card p-3">
+            <TableSkeleton />
+          </div>
+        ) : data && data.length > 0 ? (
+          data.map((item, index) => (
+            <div
+              key={getRowKey ? getRowKey(item, index) : index}
+              className={cn(
+                "rounded-lg border border-border/60 bg-card p-3 space-y-2",
+                onRowClick && "cursor-pointer",
               )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </ScrollArea>
+              onClick={() => onRowClick?.(item)}
+            >
+              {mobileCardRenderer
+                ? mobileCardRenderer(item, index)
+                : columns.map((column, colIndex) => (
+                    <div
+                      key={colIndex}
+                      className="flex items-start justify-between gap-3 text-sm"
+                    >
+                      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        {column.header}
+                      </span>
+                      <div className="min-w-0 flex-1 text-right">
+                        {column.accessor(item, index)}
+                      </div>
+                    </div>
+                  ))}
+
+              {actions && actions.length > 0 && (
+                <div className="flex justify-end pt-1">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="h-8"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                        <span className="ml-1">Actions</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent
+                      align="end"
+                      className="max-h-72 w-48 overflow-y-auto border-border/60"
+                    >
+                      <DropdownMenuLabel className="text-foreground font-medium">
+                        Activities
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator className="bg-border/50" />
+
+                      {actions.map((action, actionIndex) => (
+                        <DropdownMenuItem
+                          key={actionIndex}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            action.onClick(item);
+                          }}
+                          className={cn(
+                            "text-foreground cursor-pointer font-medium",
+                            action.className,
+                          )}
+                        >
+                          {action.icon && (
+                            <action.icon className="mr-2 h-4 w-4" />
+                          )}
+                          {action.label}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              )}
+            </div>
+          ))
+        ) : (
+          <div className="rounded-lg border border-border/60 bg-card p-3 text-center text-sm text-muted-foreground">
+            {emptyMessage}
+          </div>
+        )}
+      </div>
+
+      <div
+        ref={tableScrollRef}
+        className="hidden md:block overflow-x-auto overflow-y-hidden touch-pan-x rounded-lg border border-border/60 bg-card"
+        style={{ WebkitOverflowScrolling: "touch" }}
+      >
+        <div style={{ minWidth: mobileTableMinWidthPx }}>
+          <CardContent className="px-0 sm:px-2">
+            <table className="w-full border-collapse text-sm [&_tr]:border-b [&_tr]:border-border/30">
+              <thead>
+                <tr className="sticky top-0 z-10 border-b border-border bg-muted/40 backdrop-blur">
+                  {columns.map((column, index) => (
+                    <th
+                      key={index}
+                      className={`h-9 text-center text-[11px] font-semibold uppercase tracking-wide text-muted-foreground ${
+                        column.className || ""
+                      }`}
+                    >
+                      {column.header}
+                    </th>
+                  ))}
+                  {actions && actions.length > 0 && (
+                    <th className="h-9 px-2 text-right text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      Activities
+                    </th>
+                  )}
+                </tr>
+              </thead>
+
+              <tbody>
+                {isLoading ? (
+                  <tr>
+                    <td
+                      className="p-2"
+                      colSpan={columns.length + (actions ? 1 : 0)}
+                    >
+                      <TableSkeleton />
+                    </td>
+                  </tr>
+                ) : data && data.length > 0 ? (
+                  data.map((item, index) => (
+                    <tr
+                      key={getRowKey ? getRowKey(item, index) : index}
+                      className={cn(
+                        "transition-colors hover:bg-muted/30",
+                        onRowClick && "cursor-pointer",
+                      )}
+                      onClick={() => onRowClick?.(item)}
+                    >
+                      {columns.map((column, colIndex) => (
+                        <td
+                          key={colIndex}
+                          className={`h-11 p-2 text-center text-sm whitespace-nowrap ${column.className || ""}`}
+                        >
+                          {column.accessor(item, index)}
+                        </td>
+                      ))}
+                      {actions && actions.length > 0 && (
+                        <td className="p-2 text-right whitespace-nowrap">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 rounded-md hover:bg-muted"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <MoreHorizontal className="h-4 w-4 text-foreground/70" />
+                              </Button>
+                            </DropdownMenuTrigger>
+
+                            <DropdownMenuContent
+                              align="end"
+                              className="border-border/60"
+                            >
+                              <DropdownMenuLabel className="text-foreground font-medium">
+                                Activities
+                              </DropdownMenuLabel>
+
+                              <DropdownMenuSeparator className="bg-border/50" />
+
+                              {actions.map((action, actionIndex) => (
+                                <DropdownMenuItem
+                                  key={actionIndex}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    action.onClick(item);
+                                  }}
+                                  className={`text-foreground cursor-pointer font-medium ${
+                                    action.className || ""
+                                  }`}
+                                >
+                                  {action.icon && (
+                                    <action.icon className="mr-2 h-4 w-4" />
+                                  )}
+                                  {action.label}
+                                </DropdownMenuItem>
+                              ))}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </td>
+                      )}
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      className="p-2 text-center"
+                      colSpan={columns.length + (actions ? 1 : 0)}
+                    >
+                      {emptyMessage}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </CardContent>
+        </div>
+      </div>
 
       {/* Pagination */}
       {showPagination && paginationData && onPageChange && (

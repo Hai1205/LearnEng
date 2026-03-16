@@ -16,17 +16,17 @@ interface DashboardHeaderProps {
 export const DashboardHeader = ({
   title,
   onCreateClick,
-  createButtonText = "Create",
+  createButtonText = "Create New",
   onImportClick,
-  importButtonText = "Import",
+  importButtonText = "Import Excel",
   onExportClick,
-  exportButtonText = "Export",
+  exportButtonText = "Export Excel",
   children,
 }: DashboardHeaderProps) => {
   return (
-    <div className="flex items-center justify-between pb-6 border-b border-border/50 mb-6">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pb-6 border-b border-border/50 mb-6">
       <div className="space-y-1">
-        <h2 className="text-3xl font-bold tracking-tight bg-linear-to-br from-primary to-secondary bg-clip-text text-transparent">
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight bg-linear-to-br from-primary to-secondary bg-clip-text text-transparent">
           {title}
         </h2>
         <p className="text-sm text-muted-foreground">
@@ -34,7 +34,7 @@ export const DashboardHeader = ({
         </p>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex w-full sm:w-auto flex-wrap items-center gap-2 sm:gap-3">
         {children}
         {onImportClick && (
           <Button

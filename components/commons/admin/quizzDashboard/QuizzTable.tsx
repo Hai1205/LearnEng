@@ -34,6 +34,58 @@ export const QuizzTable = ({
   onPageChange,
   showPagination = false,
 }: QuizzTableProps) => {
+  const renderMobileCard = (card: IQuizz, index: number) => {
+    const no = paginationData
+      ? (paginationData.currentPage - 1) * paginationData.pageSize + index + 1
+      : index + 1;
+
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            No
+          </span>
+          <span className="text-sm font-medium">{no}</span>
+        </div>
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Category
+          </span>
+          <span className="max-w-[65%] truncate text-right text-sm capitalize">
+            {card.category}
+          </span>
+        </div>
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Topic
+          </span>
+          <span className="max-w-[65%] truncate text-right text-sm capitalize">
+            {card.topic}
+          </span>
+        </div>
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Level
+          </span>
+          <div className="inline-flex items-center gap-2 text-sm">
+            <span
+              className={`h-2 w-2 rounded-full ${getLevelColor(card.level)}`}
+            />
+            <span className="capitalize">{card.level}</span>
+          </div>
+        </div>
+        <div className="flex items-start justify-between gap-2">
+          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Question
+          </span>
+          <span className="max-w-[65%] text-right text-sm line-clamp-2">
+            {card.question}
+          </span>
+        </div>
+      </div>
+    );
+  };
+
   const columns = [
     {
       header: "No",
@@ -118,10 +170,13 @@ export const QuizzTable = ({
       isLoading={isLoading}
       columns={columns}
       actions={actions}
+      getRowKey={(card) => card.id}
+      mobileCardRenderer={renderMobileCard}
       emptyMessage="No cards found."
       showPagination={showPagination}
       paginationData={paginationData}
       onPageChange={onPageChange}
+      mobileTableMinWidthPx={980}
     />
   );
 };

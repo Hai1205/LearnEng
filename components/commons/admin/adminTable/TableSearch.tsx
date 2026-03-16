@@ -13,16 +13,14 @@ export const TableSearch = ({
   placeholder,
 }: TableSearchProps) => {
   return (
-    <form className="relative group">
-      <Search
-        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground group-focus-within:text-primary w-4 h-4 transition-colors z-10 pointer-events-none"
-      />
+    <form className="relative group w-full sm:w-auto">
+      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground group-focus-within:text-primary w-4 h-4 transition-colors z-10 pointer-events-none" />
       <Input
         type="text"
         placeholder={placeholder}
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="pl-10 h-9 w-75 border-border/50 bg-background/50 backdrop-blur-sm focus:border-primary/50 focus:ring-primary/20 transition-all"
+        className="pl-10 h-9 w-full sm:w-75 border-border/50 bg-background/50 backdrop-blur-sm focus:border-primary/50 focus:ring-primary/20 transition-all"
       />
     </form>
   );

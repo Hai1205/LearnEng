@@ -82,9 +82,6 @@ export default function QuizzResult({
       <div className="w-full max-w-150">
         {/* Score card */}
         <div className="bg-white/4 backdrop-blur-xl border border-white/9 rounded-[22px] p-8 text-center mb-3.5">
-          <div className="text-[52px] mb-2">
-            {pct >= 80 ? "🏆" : pct >= 60 ? "🎯" : "📖"}
-          </div>
           <div
             className="text-[68px] font-bold leading-none italic"
             style={{ color: gradeColor }}

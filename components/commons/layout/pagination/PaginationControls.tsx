@@ -91,9 +91,9 @@ export function PaginationControls({
   if (totalPages <= 1) return null;
 
   return (
-    <div className={cn("flex flex-col items-center gap-4 mt-6", className)}>
+    <div className={cn("mt-4 space-y-3", className)}>
       {/* Info text */}
-      <div className="text-sm text-muted-foreground bg-card/50 backdrop-blur-sm px-4 py-2 rounded-lg border border-border/50">
+      <div className="mx-auto w-fit rounded-md border border-border/60 bg-muted/20 px-3 py-1.5 text-xs text-muted-foreground">
         Showing{" "}
         <span className="font-semibold text-foreground">{startItem}</span> to{" "}
         <span className="font-semibold text-foreground">{endItem}</span> of{" "}
@@ -101,76 +101,113 @@ export function PaginationControls({
         results
       </div>
 
-      {/* Pagination controls */}
-      <Pagination>
-        <PaginationContent className="bg-card/80 backdrop-blur-sm px-2 py-2 rounded-xl border border-border/50 shadow-lg">
-          {/* First page button */}
-          {showFirstLast && currentPage > 1 && (
-            <PaginationItem>
-              <PaginationLink
-                onClick={() => onPageChange(1)}
-                className="rounded-lg hover:scale-105 transition-transform"
-              >
-                <span className="text-xs">First</span>
-              </PaginationLink>
-            </PaginationItem>
+      {/* Mobile pagination */}
+      <div className="flex items-center justify-center gap-2 sm:hidden">
+        <button
+          type="button"
+          onClick={() => hasPrevious && onPageChange(currentPage - 1)}
+          disabled={!hasPrevious}
+          className={cn(
+            "h-8 rounded-md border px-3 text-xs font-medium transition-colors",
+            hasPrevious
+              ? "border-border bg-card hover:bg-muted"
+              : "border-border/50 bg-muted/20 text-muted-foreground cursor-not-allowed",
           )}
+        >
+          Prev
+        </button>
 
-          {/* Previous button */}
-          {hasPrevious && (
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => onPageChange(currentPage - 1)}
-                className="rounded-lg hover:scale-105 transition-transform"
-              />
-            </PaginationItem>
+        <div className="min-w-20 rounded-md border border-border/60 bg-card px-3 py-1.5 text-center text-xs font-medium">
+          {currentPage} / {totalPages}
+        </div>
+
+        <button
+          type="button"
+          onClick={() => hasNext && onPageChange(currentPage + 1)}
+          disabled={!hasNext}
+          className={cn(
+            "h-8 rounded-md border px-3 text-xs font-medium transition-colors",
+            hasNext
+              ? "border-border bg-card hover:bg-muted"
+              : "border-border/50 bg-muted/20 text-muted-foreground cursor-not-allowed",
           )}
+        >
+          Next
+        </button>
+      </div>
 
-          {/* Page numbers */}
-          {pageNumbers.map((page, index) =>
-            page === "ellipsis" ? (
-              <PaginationItem key={`ellipsis-${index}`}>
-                <PaginationEllipsis />
-              </PaginationItem>
-            ) : (
-              <PaginationItem key={page}>
+      {/* Desktop pagination */}
+      <div className="hidden sm:block">
+        <Pagination>
+          <PaginationContent className="rounded-lg border border-border/60 bg-card px-1.5 py-1">
+            {/* First page button */}
+            {showFirstLast && currentPage > 1 && (
+              <PaginationItem>
                 <PaginationLink
-                  onClick={() => onPageChange(page)}
-                  isActive={currentPage === page}
-                  className={cn(
-                    "rounded-lg hover:scale-105 transition-transform min-w-10",
-                    currentPage === page && "pointer-events-none"
-                  )}
+                  onClick={() => onPageChange(1)}
+                  className="h-8 rounded-md px-2 text-xs"
                 >
-                  {page}
+                  <span className="text-xs">First</span>
                 </PaginationLink>
               </PaginationItem>
-            )
-          )}
+            )}
 
-          {/* Next button */}
-          {hasNext && (
-            <PaginationItem>
-              <PaginationNext
-                onClick={() => onPageChange(currentPage + 1)}
-                className="rounded-lg hover:scale-105 transition-transform"
-              />
-            </PaginationItem>
-          )}
+            {/* Previous button */}
+            {hasPrevious && (
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => onPageChange(currentPage - 1)}
+                  className="h-8 rounded-md"
+                />
+              </PaginationItem>
+            )}
 
-          {/* Last page button */}
-          {showFirstLast && currentPage < totalPages && (
-            <PaginationItem>
-              <PaginationLink
-                onClick={() => onPageChange(totalPages)}
-                className="rounded-lg hover:scale-105 transition-transform"
-              >
-                <span className="text-xs">Last</span>
-              </PaginationLink>
-            </PaginationItem>
-          )}
-        </PaginationContent>
-      </Pagination>
+            {/* Page numbers */}
+            {pageNumbers.map((page, index) =>
+              page === "ellipsis" ? (
+                <PaginationItem key={`ellipsis-${index}`}>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              ) : (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    onClick={() => onPageChange(page)}
+                    isActive={currentPage === page}
+                    className={cn(
+                      "h-8 min-w-8 rounded-md px-2 text-xs",
+                      currentPage === page && "pointer-events-none",
+                    )}
+                  >
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              ),
+            )}
+
+            {/* Next button */}
+            {hasNext && (
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => onPageChange(currentPage + 1)}
+                  className="h-8 rounded-md"
+                />
+              </PaginationItem>
+            )}
+
+            {/* Last page button */}
+            {showFirstLast && currentPage < totalPages && (
+              <PaginationItem>
+                <PaginationLink
+                  onClick={() => onPageChange(totalPages)}
+                  className="h-8 rounded-md px-2 text-xs"
+                >
+                  <span className="text-xs">Last</span>
+                </PaginationLink>
+              </PaginationItem>
+            )}
+          </PaginationContent>
+        </Pagination>
+      </div>
     </div>
   );
 }
