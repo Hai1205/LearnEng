@@ -72,10 +72,6 @@ npm run dev:turbo    # with Turbopack
 
 ![Home Page](public/images/home_page.png)
 
-### Dashboard Page
-
-![Dashboard Page](public/images/dashboard_page.png)
-
 ### Flash Card Dashboard Page
 
 ![Flash Card Dashboard Page](public/images/flash_card_dashboard_page.png)
@@ -88,7 +84,7 @@ npm run dev:turbo    # with Turbopack
 
 ![Flash Card Page](public/images/flash_card_page.png)
 
-### Quizz Home Page
+### Quizz Controller Page
 
 ![Quizz Home Page](public/images/quizz_controller_page.png)
 
@@ -99,6 +95,10 @@ npm run dev:turbo    # with Turbopack
 ### Quizz Result Page
 
 ![Quizz Result Page](public/images/quizz_result_page.png)
+
+### History Page
+
+![Quizz Home Page](public/images/history_page.png)
 
 ## Production
 

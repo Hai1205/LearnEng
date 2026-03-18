@@ -1,5 +1,6 @@
-import AdminDashboardClient from "@/components/commons/admin/adminDashboard/AdminDashboardClient";
 
-export default async function AdminDashboardPage() {
-  return <AdminDashboardClient />;
+import { redirect } from "next/navigation";
+
+export default function AdminDashboardPage() {
+	redirect("/admin/flash-card-dashboard");
 }

@@ -23,6 +23,8 @@ interface QuizzQuestionProps {
   onConfirm: () => void;
   onNext: () => void;
   onExit: () => void;
+  onBack: () => void;
+  onRetryCurrent: () => void;
 }
 
 function fmtTime(s: number) {
@@ -41,6 +43,8 @@ export default function QuizzQuestion({
   onConfirm,
   onNext,
   onExit,
+  onBack,
+  onRetryCurrent,
 }: QuizzQuestionProps) {
   const lv = LEVEL_COLORS[question.level];
   const progress = ((idx + 1) / total) * 100;
@@ -176,28 +180,48 @@ export default function QuizzQuestion({
         )}
       </div>
 
-      {/* Action button */}
-      {!confirmed ? (
-        <button
-          onClick={onConfirm}
-          disabled={selected === null}
-          className={cn(
-            "py-3.5 px-10 rounded-xl border-none text-sm font-bold font-inherit tracking-wider transition-all",
-            selected !== null
-              ? "bg-linear-to-br from-sky-400 to-indigo-400 text-white cursor-pointer shadow-[0_4px_20px_rgba(56,189,248,0.3)]"
-              : "bg-white/8 text-white/25 cursor-default",
-          )}
-        >
-          Xác nhận
-        </button>
-      ) : (
-        <button
-          onClick={onNext}
-          className="py-3.5 px-10 rounded-xl border-none bg-linear-to-br from-sky-400 to-indigo-400 text-white text-sm font-bold font-inherit tracking-wider cursor-pointer shadow-[0_4px_20px_rgba(56,189,248,0.3)]"
-        >
-          {idx + 1 >= total ? "Xem kết quả 🏆" : "Tiếp theo →"}
-        </button>
-      )}
+      {/* Action buttons (Back + Confirm/Next) */}
+      <div className="w-full max-w-150 flex items-center justify-center gap-3">
+        {idx > 0 && (
+          <button
+            onClick={() => onBack()}
+            className="py-3 px-6 rounded-xl border border-white/10 text-sm font-medium text-white/70 hover:bg-white/6 transition-colors"
+          >
+            ← Quay lại
+          </button>
+        )}
+
+        {confirmed && (
+          <button
+            onClick={() => onRetryCurrent()}
+            className="py-3 px-6 rounded-xl border border-white/10 text-sm font-medium text-white/70 hover:bg-white/6 transition-colors flex items-center"
+          >
+            Làm lại
+          </button>
+        )}
+
+        {!confirmed ? (
+          <button
+            onClick={onConfirm}
+            disabled={selected === null}
+            className={cn(
+              "py-3.5 px-10 rounded-xl border-none text-sm font-bold font-inherit tracking-wider transition-all",
+              selected !== null
+                ? "bg-linear-to-br from-sky-400 to-indigo-400 text-white cursor-pointer shadow-[0_4px_20px_rgba(56,189,248,0.3)]"
+                : "bg-white/8 text-white/25 cursor-default",
+            )}
+          >
+            Xác nhận
+          </button>
+        ) : (
+          <button
+            onClick={onNext}
+            className="py-3.5 px-10 rounded-xl border-none bg-linear-to-br from-sky-400 to-indigo-400 text-white text-sm font-bold font-inherit tracking-wider cursor-pointer shadow-[0_4px_20px_rgba(56,189,248,0.3)]"
+          >
+            {idx + 1 >= total ? "Xem kết quả 🏆" : "Tiếp theo →"}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

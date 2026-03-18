@@ -141,6 +141,25 @@ export default function QuizzClient() {
     }
   };
 
+  const handleRetryCurrent = useCallback(() => {
+    const q = pool[idx];
+    if (!q) return;
+    setAnswers((prev) => prev.filter((a) => a.qid !== q.id));
+    setSelected(null);
+    setConfirmed(false);
+    setStreak(0);
+  }, [idx, pool]);
+
+  const handleBack = useCallback(() => {
+    setIdx((cur) => {
+      const newIdx = Math.max(0, cur - 1);
+      setAnswers((prev) => prev.slice(0, newIdx));
+      setSelected(null);
+      setConfirmed(false);
+      return newIdx;
+    });
+  }, []);
+
   if (isLoading) {
     return <QuizzSkeleton />;
   }
@@ -171,6 +190,8 @@ export default function QuizzClient() {
         onSelect={handleSelect}
         onConfirm={handleConfirm}
         onNext={handleNext}
+          onBack={handleBack}
+          onRetryCurrent={handleRetryCurrent}
         onExit={() => setScreen("home")}
       />
     );

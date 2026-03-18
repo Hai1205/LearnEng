@@ -22,7 +22,6 @@ export const AdminSidebar = ({
   const pathname = usePathname();
 
   const menuItems = [
-    { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
     {
       icon: Brain,
       label: "Flash Card Dashboard",
