@@ -184,7 +184,7 @@ export default function FlashCardDashboardClient() {
   // Import
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [isDraggingOnPage, setIsDraggingOnPage] = useState(false);
-  const [droppedFile, setDroppedFile] = useState<File | null>(null);
+  const [droppedFile, setDroppedFile] = useState<File[] | null>(null);
 
   const defaultFlashCard: IFlashCard = {
     id: "",
@@ -267,22 +267,47 @@ export default function FlashCardDashboardClient() {
   };
 
   // Import handlers
-  const handleImport = async (file: File) => {
-    importFlashCardsAsync(file, {
-      onSuccess: (response) => {
-        const { imported, errors, cards } = response.data;
-        cards.forEach((c) => addToAdminFlashCards(c));
+  const handleImport = async (files: File[]) => {
+    try {
+      const form = new FormData();
+      files.forEach((f) => form.append("file", f));
+
+      const res = await fetch("/api/quizzes/import", {
+        method: "POST",
+        body: form,
+      });
+
+      const json = await res.json();
+      if (!res.ok) {
+        toast.error(json?.error || "Import thất bại");
+        return;
+      }
+
+      const { imported, errors, cards } = json.data;
+      (cards || []).forEach((c: any) => addToAdminFlashCards(c));
+      if (imported && Number(imported) > 0) {
         toast.success(`Import thành công ${imported} flash cards!`);
-        if (errors && errors.length > 0) {
-          toast.warning(`${errors.length} dòng bị bỏ qua do lỗi`);
-        }
-        setIsImportDialogOpen(false);
-        setDroppedFile(null);
-      },
-      onError: (error) => {
-        toast.error(error.message || "Import thất bại");
-      },
-    });
+      }
+
+      if (errors && errors.length > 0) {
+        toast.warning(`${errors.length} dòng/file bị bỏ qua do lỗi`);
+        const content = errors.join("\n");
+        const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `flashcards_import_errors_${new Date().toISOString().slice(0, 10)}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      setIsImportDialogOpen(false);
+      setDroppedFile(null);
+    } catch (err: any) {
+      toast.error(err?.message || "Import thất bại");
+    }
   };
 
   const handlePageDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
@@ -310,11 +335,14 @@ export default function FlashCardDashboardClient() {
     e.preventDefault();
     e.stopPropagation();
     setIsDraggingOnPage(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file && (file.name.endsWith(".xlsx") || file.name.endsWith(".xls"))) {
-      setDroppedFile(file);
+    const fileList = Array.from(e.dataTransfer.files || []);
+    const excelFiles = fileList.filter(
+      (f) => f.name.endsWith(".xlsx") || f.name.endsWith(".xls"),
+    );
+    if (excelFiles.length > 0) {
+      setDroppedFile(excelFiles);
       setIsImportDialogOpen(true);
-    } else if (file) {
+    } else if (fileList.length > 0) {
       toast.error("Chỉ chấp nhận file Excel (.xlsx, .xls)!");
     }
   };
@@ -450,7 +478,7 @@ export default function FlashCardDashboardClient() {
         onImport={handleImport}
         title="Import Flash Cards"
         isLoading={isImporting}
-        externalFile={droppedFile}
+        externalFiles={droppedFile ?? null}
       />
     </div>
   );

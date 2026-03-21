@@ -11,15 +11,16 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ImportExcelDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onImport: (file: File) => void;
+  onImport: (files: File[]) => void;
   title?: string;
   description?: string;
   isLoading?: boolean;
-  externalFile?: File | null;
+  externalFiles?: File[] | null;
 }
 
 export const ImportExcelDialog = ({
@@ -29,13 +30,13 @@ export const ImportExcelDialog = ({
   title = "Import from Excel",
   description = "Upload an Excel file (.xlsx, .xls) to import data in bulk.",
   isLoading = false,
-  externalFile,
+  externalFiles,
 }: ImportExcelDialogProps) => {
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const selectedFile = externalFile ?? file;
+  const selectedFiles = externalFiles ?? files;
 
   const isExcelFile = (f: File) => {
     return (
@@ -47,15 +48,16 @@ export const ImportExcelDialog = ({
     );
   };
 
-  const handleFileSelect = (f: File) => {
-    if (isExcelFile(f)) {
-      setFile(f);
+  const handleFilesSelect = (incoming: FileList | File[]) => {
+    const arr = Array.from(incoming).filter(isExcelFile);
+    if (arr.length > 0) {
+      setFiles((prev) => [...prev, ...arr]);
     }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (f) handleFileSelect(f);
+    const fList = e.target.files;
+    if (fList && fList.length > 0) handleFilesSelect(fList);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -74,32 +76,35 @@ export const ImportExcelDialog = ({
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
-    const f = e.dataTransfer.files?.[0];
-    if (f) handleFileSelect(f);
+    const fList = e.dataTransfer.files;
+    if (fList && fList.length > 0) handleFilesSelect(fList);
   };
 
   const handleImport = () => {
-    if (selectedFile) {
-      onImport(selectedFile);
+    if (selectedFiles && selectedFiles.length > 0) {
+      onImport(selectedFiles);
     }
   };
 
   const handleClose = (open: boolean) => {
     if (!open) {
-      setFile(null);
+      setFiles([]);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
     onOpenChange(open);
   };
 
-  const clearFile = () => {
-    setFile(null);
+  const clearFiles = () => {
+    setFiles([]);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const removeFileAt = (idx: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== idx));
+  };
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[80vh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileSpreadsheet className="h-5 w-5 text-green-600" />
@@ -108,7 +113,7 @@ export const ImportExcelDialog = ({
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 flex-1 pr-1 overflow-hidden pb-4">
           {/* Drop zone */}
           <div
             className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
@@ -127,6 +132,7 @@ export const ImportExcelDialog = ({
               accept=".xlsx,.xls"
               onChange={handleInputChange}
               className="hidden"
+              multiple
             />
             <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
             <p className="text-sm font-medium">
@@ -137,31 +143,51 @@ export const ImportExcelDialog = ({
             </p>
           </div>
 
-          {/* Selected file display */}
-          {selectedFile && (
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border/50">
-              <FileSpreadsheet className="h-8 w-8 text-green-600 shrink-0" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">
-                  {selectedFile.name}
+          {/* Selected files display */}
+          {selectedFiles && selectedFiles.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm font-medium">
+                  Selected files ({selectedFiles.length})
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  {(selectedFile.size / 1024).toFixed(1)} KB
-                </p>
+                {!externalFiles && (
+                  <Button variant="ghost" size="sm" onClick={clearFiles}>
+                    Clear
+                  </Button>
+                )}
               </div>
-              {!externalFile && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 shrink-0"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    clearFile();
-                  }}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
+
+              <ScrollArea className="h-56 max-h-56 rounded-md border border-border/50 mb-4 overflow-hidden">
+                <div className="space-y-2 p-2 pb-8">
+                  {selectedFiles.map((f, idx) => (
+                    <div
+                      key={`${f.name}-${idx}`}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-muted/50"
+                    >
+                      <FileSpreadsheet className="h-8 w-8 text-green-600 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{f.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {(f.size / 1024).toFixed(1)} KB
+                        </p>
+                      </div>
+                      {!externalFiles && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 shrink-0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeFileAt(idx);
+                          }}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
             </div>
           )}
 
@@ -175,7 +201,7 @@ export const ImportExcelDialog = ({
           </div>
         </div>
 
-        <DialogFooter className="gap-2">
+        <DialogFooter className="gap-2 sticky bottom-0 z-10 bg-background/60 backdrop-blur-sm py-2">
           <Button
             variant="outline"
             onClick={() => handleClose(false)}
@@ -185,7 +211,7 @@ export const ImportExcelDialog = ({
           </Button>
           <Button
             onClick={handleImport}
-            disabled={!selectedFile || isLoading}
+            disabled={!(selectedFiles && selectedFiles.length > 0) || isLoading}
             className="gap-2"
           >
             {isLoading ? (

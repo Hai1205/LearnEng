@@ -22,12 +22,12 @@ export const AdminSidebar = ({
   const pathname = usePathname();
 
   const menuItems = [
+    { icon: BookOpen, label: "Quizz Dashboard", href: "/admin/quizz-dashboard" },
     {
       icon: Brain,
       label: "Flash Card Dashboard",
       href: "/admin/flash-card-dashboard",
     },
-    { icon: BookOpen, label: "Quizz Dashboard", href: "/admin/quizz-dashboard" },
   ];
 
   return (
