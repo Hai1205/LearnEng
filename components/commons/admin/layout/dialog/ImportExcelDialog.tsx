@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Upload, FileSpreadsheet, X, AlertCircle } from "lucide-react";
 import {
   Dialog,
@@ -32,11 +32,17 @@ export const ImportExcelDialog = ({
   isLoading = false,
   externalFiles,
 }: ImportExcelDialogProps) => {
-  const [files, setFiles] = useState<File[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>(
+    externalFiles ?? [],
+  );
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const selectedFiles = externalFiles ?? files;
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedFiles(externalFiles ?? []);
+    }
+  }, [isOpen, externalFiles]);
 
   const isExcelFile = (f: File) => {
     return (
@@ -51,7 +57,7 @@ export const ImportExcelDialog = ({
   const handleFilesSelect = (incoming: FileList | File[]) => {
     const arr = Array.from(incoming).filter(isExcelFile);
     if (arr.length > 0) {
-      setFiles((prev) => [...prev, ...arr]);
+      setSelectedFiles((prev) => [...prev, ...arr]);
     }
   };
 
@@ -88,19 +94,21 @@ export const ImportExcelDialog = ({
 
   const handleClose = (open: boolean) => {
     if (!open) {
-      setFiles([]);
+      // reset local selection when closing; restore externalFiles if provided
+      if (externalFiles) setSelectedFiles(externalFiles ?? []);
+      else setSelectedFiles([]);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
     onOpenChange(open);
   };
 
   const clearFiles = () => {
-    setFiles([]);
+    setSelectedFiles([]);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const removeFileAt = (idx: number) => {
-    setFiles((prev) => prev.filter((_, i) => i !== idx));
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== idx));
   };
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -150,11 +158,9 @@ export const ImportExcelDialog = ({
                 <p className="text-sm font-medium">
                   Selected files ({selectedFiles.length})
                 </p>
-                {!externalFiles && (
-                  <Button variant="ghost" size="sm" onClick={clearFiles}>
-                    Clear
-                  </Button>
-                )}
+                <Button variant="ghost" size="sm" onClick={clearFiles}>
+                  Clear
+                </Button>
               </div>
 
               <ScrollArea className="h-56 max-h-56 rounded-md border border-border/50 mb-4 overflow-hidden">
@@ -171,19 +177,17 @@ export const ImportExcelDialog = ({
                           {(f.size / 1024).toFixed(1)} KB
                         </p>
                       </div>
-                      {!externalFiles && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 shrink-0"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeFileAt(idx);
-                          }}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      )}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 shrink-0"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeFileAt(idx);
+                        }}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
                     </div>
                   ))}
                 </div>
