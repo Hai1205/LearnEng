@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { NumericInput } from "@/components/commons/layout/NumericInput";
 import { ChevronDown, Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -152,17 +153,14 @@ export const QuizzForm = ({ data, onChange }: QuizzFormProps) => {
           <Label htmlFor="form-answer" className="text-sm font-medium">
             Answer
           </Label>
-          <Input
+          <NumericInput
             id="form-answer"
-            type="number"
             min={0}
             max={3}
-            value={data?.answer ?? ""}
-            onChange={(e) => {
-              const v = parseInt(e.target.value);
-              if (e.target.value === "") onChange("answer", "");
-              else if (!isNaN(v) && v >= 0 && v <= 3) onChange("answer", v);
-            }}
+            value={data?.answer ?? 0}
+            onValueChange={(nextValue) => onChange("answer", nextValue)}
+            emptyValue={0}
+            hideZero={true}
             className="bg-background/50 border-border/50 focus:border-primary transition-colors"
             placeholder="0 - 3"
           />

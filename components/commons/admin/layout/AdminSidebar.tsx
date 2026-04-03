@@ -1,6 +1,13 @@
 "use client";
 
-import { LayoutDashboard, BookOpen, Brain, Menu, X } from "lucide-react";
+import {
+  LayoutDashboard,
+  BookOpen,
+  Brain,
+  Menu,
+  X,
+  ClipboardList,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -22,7 +29,16 @@ export const AdminSidebar = ({
   const pathname = usePathname();
 
   const menuItems = [
-    { icon: BookOpen, label: "Quizz Dashboard", href: "/admin/quizz-dashboard" },
+    {
+      icon: BookOpen,
+      label: "Quizz Dashboard",
+      href: "/admin/quizz-dashboard",
+    },
+    {
+      icon: ClipboardList,
+      label: "Test Result Dashboard",
+      href: "/admin/test-result-dashboard",
+    },
     {
       icon: Brain,
       label: "Flash Card Dashboard",

@@ -6,80 +6,78 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { TableDashboardSkeleton } from "../adminTable/TableDashboardSkeleton";
 import { DashboardHeader } from "../layout/dashboard/DashboardHeader";
-import { CreateQuizzDialog } from "./CreateQuizzDialog";
-import { UpdateQuizzDialog } from "./UpdateQuizzDialog";
+import { CreateTestResultDialog } from "./CreateTestResultDialog";
 import { TableSearch } from "../adminTable/TableSearch";
-import { QuizzFilter } from "./QuizzFilter";
-import { QuizzTable } from "./QuizzTable";
 import { ConfirmationDialog } from "../../layout/ConfirmationDialog";
-import { useQuizzStore } from "@/stores/quizzStore";
 import { ImportExcelDialog } from "../layout/dialog/ImportExcelDialog";
 import { DraggingOnPage } from "../../layout/Dragging/DraggingOnPage";
-import {
-  useAllQuizzesQuery,
-  useCreateQuizzMutation,
-  useUpdateQuizzMutation,
-  useDeleteQuizzMutation,
-  useImportQuizzesMutation,
-} from "@/hooks/useQuizzApi";
+import { useTestResultStore } from "@/stores/testResultStore";
 import { toast } from "react-toastify";
 import * as XLSX from "xlsx";
+import {
+  useAllTestResultsQuery,
+  useCreateTestResultMutation,
+  useDeleteTestResultMutation,
+  useImportTestResultsMutation,
+  useUpdateTestResultMutation,
+} from "@/hooks/useTestResultApi";
+import { UpdateTestResultDialog } from "./UpdateTestResultDialog";
+import { TestResultFilter } from "./TestResultFilter";
+import { TestResultTable } from "./TestResultTable";
 
-export type QuizzFilterType = "category" | "topic" | "level";
-export interface IQuizzFilter {
+export type TestResultFilterType = "category";
+export interface ITestResultFilter {
   category: string[];
-  topic: string[];
-  level: string[];
   [key: string]: string[];
 }
-const cardInitialFilters: IQuizzFilter = {
+const cardInitialFilters: ITestResultFilter = {
   category: [],
-  topic: [],
-  level: [],
 };
 
-export default function QuizzDashboardClient() {
+export default function TestResultDashboardClient() {
   const {
-    adminQuizzes,
-    setAdminQuizzes,
-    removeFromAdminQuizzes,
-    addToAdminQuizzes,
-    updateInAdminQuizzes,
-  } = useQuizzStore();
+    adminTestResults,
+    setAdminTestResults,
+    removeFromAdminTestResults,
+    addToAdminTestResults,
+    updateInAdminTestResults,
+  } = useTestResultStore();
 
   const {
     data: cardsResponse,
-    isLoading: isLoadingQuizzes,
-    refetch: refetchQuizzes,
-  } = useAllQuizzesQuery();
+    isLoading: isLoadingTestResults,
+    refetch: refetchTestResults,
+  } = useAllTestResultsQuery();
 
-  const { mutateAsync: createQuizzAsync } = useCreateQuizzMutation();
-  const { mutateAsync: updateQuizzAsync } = useUpdateQuizzMutation();
-  const { mutateAsync: deleteQuizzAsync } = useDeleteQuizzMutation();
-  // const { mutateAsync: importQuizzesAsync, isPending: isImporting } =
-  //   useImportQuizzesMutation();
+  const { mutateAsync: createTestResultAsync } = useCreateTestResultMutation();
+  const { mutateAsync: updateTestResultAsync } = useUpdateTestResultMutation();
+  const { mutateAsync: deleteTestResultAsync } = useDeleteTestResultMutation();
+  // const { mutateAsync: importTestResultsAsync, isPending: isImporting } =
+  //   useImportTestResultsMutation();
 
   useEffect(() => {
-    const cards = cardsResponse?.data?.cards;
-    setAdminQuizzes(cards || []);
-  }, [cardsResponse?.data?.cards, setAdminQuizzes]);
+    const cards = cardsResponse?.data?.results;
+    setAdminTestResults(cards || []);
+  }, [cardsResponse?.data?.results, setAdminTestResults]);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [isCreateQuizzOpen, setIsCreateQuizzOpen] = useState(false);
-  const [isUpdateQuizzOpen, setIsUpdateQuizzOpen] = useState(false);
+  const [isCreateTestResultOpen, setIsCreateTestResultOpen] = useState(false);
+  const [isUpdateTestResultOpen, setIsUpdateTestResultOpen] = useState(false);
 
   const [activeFilters, setActiveFilters] =
-    useState<IQuizzFilter>(cardInitialFilters);
-  const [filteredQuizzes, setFilteredQuizzes] = useState<IQuizz[]>([]);
+    useState<ITestResultFilter>(cardInitialFilters);
+  const [filteredTestResults, setFilteredTestResults] = useState<ITestResult[]>(
+    [],
+  );
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
-  const totalPages = Math.ceil(filteredQuizzes.length / pageSize);
+  const totalPages = Math.ceil(filteredTestResults.length / pageSize);
 
   const paginationState = { page: currentPage, pageSize: pageSize };
   const paginationData = {
-    totalElements: filteredQuizzes.length,
+    totalElements: filteredTestResults.length,
     totalPages: totalPages,
     currentPage: currentPage,
     pageSize: pageSize,
@@ -92,47 +90,34 @@ export default function QuizzDashboardClient() {
   };
 
   useEffect(() => {
-    let results = [...adminQuizzes];
+    let results = [...adminTestResults];
 
     if (searchQuery.trim()) {
       const searchTerms = searchQuery.toLowerCase().trim();
       results = results.filter(
-        (card) =>
-          card.question.toLowerCase().includes(searchTerms) ||
-          card.category.toLowerCase().includes(searchTerms) ||
-          card.topic.toLowerCase().includes(searchTerms),
+        (test) =>
+          test.title.toLowerCase().includes(searchTerms) ||
+          test.category.toLowerCase().includes(searchTerms),
       );
     }
 
     if (activeFilters.category.length > 0) {
-      results = results.filter((card) =>
-        activeFilters.category.includes(card.category || ""),
+      results = results.filter((test) =>
+        activeFilters.category.includes(test.category || ""),
       );
     }
 
-    if (activeFilters.topic.length > 0) {
-      results = results.filter((card) =>
-        activeFilters.topic.includes(card.topic || ""),
-      );
-    }
-
-    if (activeFilters.level.length > 0) {
-      results = results.filter((card) =>
-        activeFilters.level.includes(card.level || ""),
-      );
-    }
-
-    setFilteredQuizzes(results);
+    setFilteredTestResults(results);
     setCurrentPage(1);
-  }, [adminQuizzes, searchQuery, activeFilters]);
+  }, [adminTestResults, searchQuery, activeFilters]);
 
-  // Paginate filtered quizzes
-  const paginatedItems = filteredQuizzes.slice(
+  // Paginate filtered adminTestResults
+  const paginatedItems = filteredTestResults.slice(
     (paginationState.page - 1) * paginationState.pageSize,
     paginationState.page * paginationState.pageSize,
   );
 
-  const toggleFilter = (value: string, type: QuizzFilterType) => {
+  const toggleFilter = (value: string, type: TestResultFilterType) => {
     setActiveFilters((prev) => {
       const updated = { ...prev };
       if (updated[type]?.includes(value)) {
@@ -147,7 +132,6 @@ export default function QuizzDashboardClient() {
   const clearFilters = () => {
     setActiveFilters(cardInitialFilters);
     setSearchQuery("");
-    setFilteredQuizzes(adminQuizzes);
     closeMenuFilters();
   };
 
@@ -158,32 +142,35 @@ export default function QuizzDashboardClient() {
   const handleRefresh = () => {
     setActiveFilters(cardInitialFilters);
     setSearchQuery("");
-    refetchQuizzes();
+    refetchTestResults();
   };
 
   const handleExport = () => {
-    if (!filteredQuizzes.length) {
-      toast.info("Không có dữ liệu quiz để export");
+    if (!filteredTestResults.length) {
+      toast.info("Không có dữ liệu test để export");
       return;
     }
 
-    const rows = filteredQuizzes.map((quiz) => ({
-      category: quiz.category,
-      topic: quiz.topic,
-      level: quiz.level,
-      question: quiz.question,
-      option1: quiz.options?.[0] || "",
-      option2: quiz.options?.[1] || "",
-      option3: quiz.options?.[2] || "",
-      option4: quiz.options?.[3] || "",
-      answer: quiz.answer,
-      explaining: quiz.explaining || "",
+    const rows = filteredTestResults.map((test) => ({
+      category: test.category,
+      title: test.title,
+      part1: test.part1,
+      part2: test.part2,
+      part3: test.part3,
+      part4: test.part4,
+      part5: test.part5,
+      part6: test.part6,
+      part7: test.part7,
+      score: test.score,
     }));
 
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(rows);
-    XLSX.utils.book_append_sheet(wb, ws, "Quizzes");
-    XLSX.writeFile(wb, `quizzes_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    XLSX.utils.book_append_sheet(wb, ws, "TestResults");
+    XLSX.writeFile(
+      wb,
+      `testresults_${new Date().toISOString().slice(0, 10)}.xlsx`,
+    );
   };
 
   const [openMenuFilters, setOpenMenuFilters] = useState(false);
@@ -191,33 +178,40 @@ export default function QuizzDashboardClient() {
 
   const [dialogKey, setDialogKey] = useState(0);
 
-  const [data, setData] = useState<IQuizz | null>(null);
+  const [data, setData] = useState<ITestResult | null>(null);
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [cardToDelete, setQuizzToDelete] = useState<IQuizz | null>(null);
+  const [cardToDelete, setTestResultToDelete] = useState<ITestResult | null>(
+    null,
+  );
 
   // Import
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [isDraggingOnPage, setIsDraggingOnPage] = useState(false);
   const [droppedFile, setDroppedFile] = useState<File[] | null>(null);
 
-  const defaultQuizz: IQuizz = {
+  const defaultTestResult: ITestResult = {
     id: "",
     category: "",
-    topic: "",
-    level: "",
-    question: "",
-    options: [],
-    answer: 0,
-    explaining: "",
+    title: "",
+    part1: 0,
+    part2: 0,
+    part3: 0,
+    part4: 0,
+    part5: 0,
+    part6: 0,
+    part7: 0,
+    score: 0,
   };
 
-  const handleChange = (field: keyof IQuizz, value: IQuizz[keyof IQuizz]) => {
+  const handleChange = (
+    field: keyof ITestResult,
+    value: ITestResult[keyof ITestResult],
+  ) => {
     setData((prev) => {
       if (!prev) {
-        return { ...defaultQuizz, [field]: value } as IQuizz;
+        return { ...defaultTestResult, [field]: value } as ITestResult;
       }
-
       return { ...prev, [field]: value };
     });
   };
@@ -225,66 +219,76 @@ export default function QuizzDashboardClient() {
   const handleUpdate = async () => {
     if (!data) return;
 
-    updateQuizzAsync(
-      {
-        cardId: data.id,
-        data: data,
-      },
-      {
-        onSuccess: (response) => {
-          const card = response?.data?.card;
-          if (card) {
-            updateInAdminQuizzes(card);
-          }
-
-          setIsUpdateQuizzOpen(false);
-        },
-      },
-    );
+    try {
+      const response = await updateTestResultAsync({ testId: data.id, data });
+      const test = response?.data?.result;
+      if (test) {
+        updateInAdminTestResults(test);
+      }
+      setIsUpdateTestResultOpen(false);
+      toast.success("Cập nhật test result thành công");
+    } catch (error: any) {
+      toast.error(error?.message || "Cập nhật test result thất bại");
+    }
   };
 
   const handleCreate = async () => {
     if (!data) return;
 
-    createQuizzAsync(data, {
-      onSuccess: (response) => {
-        const card = response?.data?.card;
-        if (card) {
-          addToAdminQuizzes(card);
-        }
+    try {
+      const payload = {
+        category: data.category,
+        title: data.title,
+        part1: data.part1,
+        part2: data.part2,
+        part3: data.part3,
+        part4: data.part4,
+        part5: data.part5,
+        part6: data.part6,
+        part7: data.part7,
+        score: data.score,
+      };
 
-        setIsCreateQuizzOpen(false);
-      },
-    });
+      const response = await createTestResultAsync(
+        payload as Omit<ITestResult, "id">,
+      );
+      const test = response?.data?.result;
+      if (test) {
+        addToAdminTestResults(test);
+      }
+      setIsCreateTestResultOpen(false);
+      toast.success("Tạo test result thành công");
+    } catch (error: any) {
+      toast.error(error?.message || "Tạo test result thất bại");
+    }
   };
 
-  const onDelete = (card: IQuizz) => {
-    setQuizzToDelete(card);
+  const onDelete = (test: ITestResult) => {
+    setTestResultToDelete(test);
     setDeleteDialogOpen(true);
   };
 
   const handleDialogClose = (open: boolean) => {
     if (!open) {
       setDeleteDialogOpen(false);
-      setQuizzToDelete(null);
+      setTestResultToDelete(null);
     }
   };
 
   const handleDialogConfirm = async () => {
     if (!cardToDelete) return;
-
-    deleteQuizzAsync(cardToDelete.id, {
+    deleteTestResultAsync(cardToDelete.id, {
       onSuccess: () => {
-        removeFromAdminQuizzes(cardToDelete.id);
+        removeFromAdminTestResults(cardToDelete.id);
         setDeleteDialogOpen(false);
-        setQuizzToDelete(null);
+        setTestResultToDelete(null);
       },
     });
   };
 
-  const onUpdate = async (card: IQuizz) => {
-    setData(card);
-    setIsUpdateQuizzOpen(true);
+  const onUpdate = async (test: ITestResult) => {
+    setData(test);
+    setIsUpdateTestResultOpen(true);
   };
 
   // Import handlers
@@ -300,27 +304,24 @@ export default function QuizzDashboardClient() {
 
       const json = await res.json();
       if (!res.ok) {
-        const msg = json?.error || "Import thất bại";
-        toast.error(msg);
+        toast.error(json?.error || "Import thất bại");
         return;
       }
 
       const { imported, errors, cards } = json.data;
-      (cards || []).forEach((c: any) => addToAdminQuizzes(c));
+      (cards || []).forEach((c: any) => addToAdminTestResults(c));
       if (imported && Number(imported) > 0) {
-        toast.success(`Import thành công ${imported} quizzes!`);
+        toast.success(`Import thành công ${imported} tests!`);
       }
 
       if (errors && errors.length > 0) {
         toast.warning(`${errors.length} dòng/file bị bỏ qua do lỗi`);
-
-        // create error txt and trigger download
         const content = errors.join("\n");
         const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `quizzes_import_errors_${new Date().toISOString().slice(0, 10)}.txt`;
+        a.download = `flashcards_import_errors_${new Date().toISOString().slice(0, 10)}.txt`;
         document.body.appendChild(a);
         a.click();
         a.remove();
@@ -371,7 +372,7 @@ export default function QuizzDashboardClient() {
     }
   };
 
-  if (isLoadingQuizzes) {
+  if (isLoadingTestResults) {
     return <TableDashboardSkeleton />;
   }
 
@@ -386,15 +387,15 @@ export default function QuizzDashboardClient() {
       {isDraggingOnPage && (
         <DraggingOnPage
           title="Thả file Excel vào đây"
-          subtitle="để import quizzes"
+          subtitle="để import tests"
         />
       )}
 
       <DashboardHeader
-        title="Quiz Dashboard"
+        title="Test Result Dashboard"
         onCreateClick={() => {
-          setData(defaultQuizz);
-          setIsCreateQuizzOpen(true);
+          setData(defaultTestResult);
+          setIsCreateTestResultOpen(true);
         }}
         onImportClick={() => {
           setDroppedFile(null);
@@ -403,27 +404,26 @@ export default function QuizzDashboardClient() {
         onExportClick={handleExport}
       />
 
-      {/* Use consistent key to avoid hydration issues */}
-      <CreateQuizzDialog
-        key={`create-${dialogKey}-${isCreateQuizzOpen ? "open" : "closed"}`}
-        isOpen={isCreateQuizzOpen}
+      <CreateTestResultDialog
+        key={`create-${dialogKey}-${isCreateTestResultOpen ? "open" : "closed"}`}
+        isOpen={isCreateTestResultOpen}
         onOpenChange={(open) => {
-          setIsCreateQuizzOpen(open);
+          setIsCreateTestResultOpen(open);
           if (!open) {
             setData(null);
             setDialogKey((prev) => prev + 1);
           }
         }}
         onChange={handleChange}
-        onQuizzCreated={handleCreate}
+        onTestResultCreated={handleCreate}
         data={data}
       />
 
-      <UpdateQuizzDialog
-        key={`update-${dialogKey}-${isUpdateQuizzOpen ? "open" : "closed"}`}
-        isOpen={isUpdateQuizzOpen}
+      <UpdateTestResultDialog
+        key={`update-${dialogKey}-${isUpdateTestResultOpen ? "open" : "closed"}`}
+        isOpen={isUpdateTestResultOpen}
         onOpenChange={(open) => {
-          setIsUpdateQuizzOpen(open);
+          setIsUpdateTestResultOpen(open);
           if (!open) {
             setData(null);
             setDialogKey((prev) => prev + 1);
@@ -431,11 +431,11 @@ export default function QuizzDashboardClient() {
         }}
         onChange={handleChange}
         data={data}
-        onQuizzUpdated={handleUpdate}
+        onTestResultUpdated={handleUpdate}
       />
 
       <div className="space-y-4">
-        <Card className="border-border/50 shadow-lg bg-linear-to-br from-card to-card/80 backdrop-blur-sm">
+        <Card className="border-border/50 shadow-lg bg-linear-to-br from-test to-test/80 backdrop-blur-sm">
           <CardHeader className="pb-4 border-b border-border/30">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <CardTitle />
@@ -444,23 +444,21 @@ export default function QuizzDashboardClient() {
                 <TableSearch
                   searchQuery={searchQuery}
                   setSearchQuery={setSearchQuery}
-                  placeholder="Search Quizzes..."
+                  placeholder="Search TestResults..."
                 />
 
                 <Button
                   variant="secondary"
                   size="sm"
                   className="h-9 gap-2 px-4 bg-linear-to-br from-secondary/80 to-secondary hover:from-secondary hover:to-secondary/90 shadow-md hover:shadow-lg hover:shadow-secondary/20 transition-all duration-200 hover:scale-105"
-                  onClick={async () => {
-                    handleRefresh();
-                  }}
+                  onClick={() => handleRefresh()}
                 >
                   <RefreshCw className="h-4 w-4" />
                   Refresh
                 </Button>
 
-                <QuizzFilter
-                  data={adminQuizzes}
+                <TestResultFilter
+                  data={adminTestResults}
                   openMenuFilters={openMenuFilters}
                   setOpenMenuFilters={setOpenMenuFilters}
                   activeFilters={activeFilters}
@@ -473,12 +471,12 @@ export default function QuizzDashboardClient() {
             </div>
           </CardHeader>
 
-          <QuizzTable
+          <TestResultTable
             cards={paginatedItems}
             isLoading={false}
             onUpdate={onUpdate}
             onDelete={onDelete}
-            showPagination={filteredQuizzes.length > 10}
+            showPagination={filteredTestResults.length > 10}
             paginationData={paginationData}
             onPageChange={setPage}
           />
@@ -488,8 +486,8 @@ export default function QuizzDashboardClient() {
       <ConfirmationDialog
         open={deleteDialogOpen}
         onOpenChange={handleDialogClose}
-        title="Delete Quizz"
-        description="This action cannot be undone. This will permanently delete the quiz and remove it from our servers."
+        title="Delete Test Result"
+        description="This action cannot be undone. This will permanently delete the test and remove it from our servers."
         confirmText="Delete"
         cancelText="Cancel"
         isDestructive={true}
@@ -503,7 +501,7 @@ export default function QuizzDashboardClient() {
           if (!open) setDroppedFile(null);
         }}
         onImport={handleImport}
-        title="Import Quizzes"
+        title="Import Test Results"
         // isLoading={isImporting}
         externalFiles={droppedFile ?? null}
       />

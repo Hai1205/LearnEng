@@ -1,6 +1,7 @@
 "use client";
 
 import { Minus, Plus } from "lucide-react";
+import { NumericInput } from "@/components/commons/layout/NumericInput";
 
 interface NumberOfQuestionProps {
   count: number;
@@ -29,17 +30,14 @@ export const NumberOfQuestion = ({
         >
           <Minus className="mx-auto h-4 w-4" />
         </button>
-        <input
-          type="number"
+        <NumericInput
           inputMode="numeric"
           min={minCount}
           max={maxCount}
           value={count}
-          onChange={(e) => {
-            const v = Number(e.target.value);
-            if (Number.isNaN(v)) return;
-            onSetCount(v);
-          }}
+          onValueChange={onSetCount}
+          emptyValue={minCount}
+          emitOnEmpty={false}
           className="h-10 flex-1 rounded-[10px] border-[1.5px] border-white/12 bg-white/6 px-3 text-center text-[14px] font-semibold text-sky-300 outline-none transition-colors focus:border-sky-400"
         />
         <button

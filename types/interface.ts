@@ -36,6 +36,20 @@ declare global {
         ipa: string
         example: string
     }
+    
+    interface ITestResult {
+        id: string
+        category: string
+        title: string
+        part1: number
+        part2: number
+        part3: number
+        part4: number
+        part5: number
+        part6: number
+        part7: number
+        score: number
+    }
 
     interface IQuizzResult {
         id: string

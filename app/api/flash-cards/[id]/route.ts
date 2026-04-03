@@ -13,7 +13,7 @@ export async function PUT(
         }
 
         const body = await request.json();
-        const { topic, word, meaning, ipa, audioUrl, ex } = body;
+        const { topic, word, meaning, ipa, audioUrl, example } = body;
 
         const db = await getDb();
         const result = await db.collection("flashcards").findOneAndUpdate(
@@ -24,8 +24,7 @@ export async function PUT(
                     ...(word !== undefined && { word }),
                     ...(meaning !== undefined && { meaning }),
                     ...(ipa !== undefined && { ipa }),
-                    ...(audioUrl !== undefined && { audioUrl }),
-                    ...(ex !== undefined && { ex }),
+                    ...(example !== undefined && { example }),
                     updatedAt: new Date(),
                 },
             },
@@ -45,8 +44,7 @@ export async function PUT(
             word: result.word ?? "",
             meaning: result.meaning ?? "",
             ipa: result.ipa ?? "",
-            audioUrl: result.audioUrl ?? "",
-            ex: result.ex ?? "",
+            example: result.example ?? "",
         };
 
         return NextResponse.json({ data: { card } });

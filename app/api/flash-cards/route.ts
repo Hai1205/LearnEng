@@ -13,7 +13,6 @@ export async function GET() {
             word: doc.word ?? "",
             meaning: doc.meaning ?? "",
             ipa: doc.ipa ?? "",
-            audioUrl: doc.audioUrl ?? "",
             example: doc.example ?? "",
         }));
         return NextResponse.json({ data: { cards } });
@@ -44,7 +43,6 @@ export async function POST(request: NextRequest) {
             word,
             meaning: meaning ?? "",
             ipa: ipa ?? "",
-            audioUrl: audioUrl ?? "",
             example: example ?? "",
             createdAt: new Date(),
             updatedAt: new Date(),

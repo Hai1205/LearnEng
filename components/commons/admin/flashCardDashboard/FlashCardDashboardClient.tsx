@@ -52,8 +52,8 @@ export default function FlashCardDashboardClient() {
   const { mutateAsync: createFlashCardAsync } = useCreateFlashCardMutation();
   const { mutateAsync: updateFlashCardAsync } = useUpdateFlashCardMutation();
   const { mutateAsync: deleteFlashCardAsync } = useDeleteFlashCardMutation();
-  const { mutateAsync: importFlashCardsAsync, isPending: isImporting } =
-    useImportFlashCardsMutation();
+  // const { mutateAsync: importFlashCardsAsync, isPending: isImporting } =
+  //   useImportFlashCardsMutation();
 
   useEffect(() => {
     const cards = cardsResponse?.data?.cards;
@@ -147,12 +147,12 @@ export default function FlashCardDashboardClient() {
   };
 
   const handleExport = () => {
-    if (!adminFlashCards.length) {
+    if (!filteredFlashCards.length) {
       toast.info("Không có dữ liệu flash card để export");
       return;
     }
 
-    const rows = adminFlashCards.map((card) => ({
+    const rows = filteredFlashCards.map((card) => ({
       topic: card.topic,
       word: card.word,
       meaning: card.meaning,
@@ -477,7 +477,7 @@ export default function FlashCardDashboardClient() {
         }}
         onImport={handleImport}
         title="Import Flash Cards"
-        isLoading={isImporting}
+        // isLoading={isImporting}
         externalFiles={droppedFile ?? null}
       />
     </div>
