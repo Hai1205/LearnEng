@@ -7,6 +7,7 @@ import {
   Menu,
   X,
   ClipboardList,
+  Pen,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -38,6 +39,11 @@ export const AdminSidebar = ({
       icon: ClipboardList,
       label: "Test Result Dashboard",
       href: "/admin/test-result-dashboard",
+    },
+    {
+      icon: Pen,
+      label: "Fix Problem Dashboard",
+      href: "/admin/fix-problem-dashboard",
     },
     {
       icon: Brain,

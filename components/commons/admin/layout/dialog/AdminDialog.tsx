@@ -8,13 +8,13 @@ import { ReactNode, useState } from "react";
 
 interface AdminDialogProps<T> {
   isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange?: (open: boolean) => void;
   title: string;
   description?: string;
   icon?: LucideIcon;
   children: ReactNode;
-  onSubmit: (data?: T) => void | Promise<void>;
-  isCreateDialog: boolean;
+  onSubmit?: (data?: T) => void | Promise<void>;
+  isCreateDialog?: boolean;
   className?: string;
   showCloseButton?: boolean;
 }
@@ -32,8 +32,10 @@ function AdminDialog<T>({
   showCloseButton = true,
 }: AdminDialogProps<T>) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
+  
   const handleSubmit = async () => {
+    if (!onSubmit) return;
+
     setIsLoading(true);
     try {
       await Promise.resolve(onSubmit());
@@ -95,32 +97,34 @@ function AdminDialog<T>({
                 </ScrollArea>
 
                 {/* Footer */}
-                <footer className="shrink-0 py-2 flex items-center justify-end gap-3 border-t border-border/30 bg-card/30 backdrop-blur-sm">
-                  <Button
-                    variant="outline"
-                    onClick={() => onOpenChange(false)}
-                    className="border-border/50 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 transition-all duration-200"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleSubmit}
-                    disabled={isLoading}
-                    className="bg-linear-to-br from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-lg hover:shadow-xl hover:shadow-primary/30 transition-all duration-200"
-                  >
-                    {isLoading ? (
-                      <span className="flex items-center gap-2">
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                        {isCreateDialog ? "Creating" : "Saving"}...
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        <Save className="h-4 w-4" />
-                        {isCreateDialog ? "Create" : "Save"}
-                      </span>
-                    )}
-                  </Button>
-                </footer>
+                {onOpenChange && (
+                  <footer className="shrink-0 py-2 flex items-center justify-end gap-3 border-t border-border/30 bg-card/30 backdrop-blur-sm">
+                    <Button
+                      variant="outline"
+                      onClick={() => onOpenChange(false)}
+                      className="border-border/50 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 transition-all duration-200"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleSubmit}
+                      disabled={isLoading}
+                      className="bg-linear-to-br from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-lg hover:shadow-xl hover:shadow-primary/30 transition-all duration-200"
+                    >
+                      {isLoading ? (
+                        <span className="flex items-center gap-2">
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                          {isCreateDialog ? "Creating" : "Saving"}...
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          <Save className="h-4 w-4" />
+                          {isCreateDialog ? "Create" : "Save"}
+                        </span>
+                      )}
+                    </Button>
+                  </footer>
+                )}
               </motion.div>
             </DialogPrimitive.Content>
           )}

@@ -6,79 +6,80 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { TableDashboardSkeleton } from "../adminTable/TableDashboardSkeleton";
 import { DashboardHeader } from "../layout/dashboard/DashboardHeader";
-import { CreateQuizzDialog } from "./CreateQuizzDialog";
-import { UpdateQuizzDialog } from "./UpdateQuizzDialog";
+import { CreateFixProblemDialog } from "./CreateFixProblemDialog";
+import { UpdateFixProblemDialog } from "./UpdateFixProblemDialog";
 import { TableSearch } from "../adminTable/TableSearch";
-import { QuizzFilter } from "./QuizzFilter";
-import { QuizzTable } from "./QuizzTable";
+import { FixProblemFilter } from "./FixProblemFilter";
+import { FixProblemTable } from "./FixProblemTable";
 import { ConfirmationDialog } from "../../layout/ConfirmationDialog";
-import { useQuizzStore } from "@/stores/quizzStore";
 import { ImportExcelDialog } from "../layout/dialog/ImportExcelDialog";
 import { DraggingOnPage } from "../../layout/Dragging/DraggingOnPage";
-import {
-  useAllQuizzesQuery,
-  useCreateQuizzMutation,
-  useUpdateQuizzMutation,
-  useDeleteQuizzMutation,
-} from "@/hooks/useQuizzApi";
 import { toast } from "react-toastify";
 import * as XLSX from "xlsx";
+import { useFixProblemStore } from "@/stores/fixProblemStore";
+import {
+  useAllFixProblemsQuery,
+  useCreateFixProblemMutation,
+  useDeleteFixProblemMutation,
+  useUpdateFixProblemMutation,
+} from "@/hooks/useFixProblemApi";
+import { EFixProblemAnswer, EFixProblemErrorType } from "@/types/enum";
+import { ViewFixProblemDialog } from "./ViewFixProblemDialog";
 
-export type QuizzFilterType = "category" | "topic" | "level";
-export interface IQuizzFilter {
+export type FixProblemFilterType = "category" | "errorType";
+export interface IFixProblemFilter {
   category: string[];
-  topic: string[];
-  level: string[];
+  errorType: string[];
   [key: string]: string[];
 }
-const cardInitialFilters: IQuizzFilter = {
+const cardInitialFilters: IFixProblemFilter = {
   category: [],
-  topic: [],
-  level: [],
+  errorType: [],
 };
 
-export default function QuizzDashboardClient() {
+export default function FixProblemDashboardClient() {
   const {
-    adminQuizzes,
-    setAdminQuizzes,
-    removeFromAdminQuizzes,
-    addToAdminQuizzes,
-    updateInAdminQuizzes,
-  } = useQuizzStore();
+    adminFixFixProblems,
+    setAdminFixFixProblems,
+    removeFromAdminFixFixProblems,
+    addToAdminFixFixProblems,
+    updateInAdminFixFixProblems,
+  } = useFixProblemStore();
 
   const {
     data: cardsResponse,
-    isLoading: isLoadingQuizzes,
-    refetch: refetchQuizzes,
-  } = useAllQuizzesQuery();
+    isLoading: isLoadingFixProblems,
+    refetch: refetchFixProblems,
+  } = useAllFixProblemsQuery();
 
-  const { mutateAsync: createQuizzAsync } = useCreateQuizzMutation();
-  const { mutateAsync: updateQuizzAsync } = useUpdateQuizzMutation();
-  const { mutateAsync: deleteQuizzAsync } = useDeleteQuizzMutation();
-  // const { mutateAsync: importQuizzesAsync, isPending: isImporting } =
-  //   useImportQuizzesMutation();
+  const { mutateAsync: createFixProblemAsync } = useCreateFixProblemMutation();
+  const { mutateAsync: updateFixProblemAsync } = useUpdateFixProblemMutation();
+  const { mutateAsync: deleteFixProblemAsync } = useDeleteFixProblemMutation();
 
   useEffect(() => {
     const cards = cardsResponse?.data?.cards;
-    setAdminQuizzes(cards || []);
-  }, [cardsResponse?.data?.cards, setAdminQuizzes]);
+    setAdminFixFixProblems(cards || []);
+  }, [cardsResponse?.data?.cards, setAdminFixFixProblems]);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [isCreateQuizzOpen, setIsCreateQuizzOpen] = useState(false);
-  const [isUpdateQuizzOpen, setIsUpdateQuizzOpen] = useState(false);
+  const [isCreateFixProblemOpen, setIsCreateFixProblemOpen] = useState(false);
+  const [isUpdateFixProblemOpen, setIsUpdateFixProblemOpen] = useState(false);
+  const [isViewFixProblemOpen, setIsViewFixProblemOpen] = useState(false);
 
   const [activeFilters, setActiveFilters] =
-    useState<IQuizzFilter>(cardInitialFilters);
-  const [filteredQuizzes, setFilteredQuizzes] = useState<IQuizz[]>([]);
+    useState<IFixProblemFilter>(cardInitialFilters);
+  const [filteredFixProblems, setFilteredFixProblems] = useState<IFixProblem[]>(
+    [],
+  );
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
-  const totalPages = Math.ceil(filteredQuizzes.length / pageSize);
+  const totalPages = Math.ceil(filteredFixProblems.length / pageSize);
 
   const paginationState = { page: currentPage, pageSize: pageSize };
   const paginationData = {
-    totalElements: filteredQuizzes.length,
+    totalElements: filteredFixProblems.length,
     totalPages: totalPages,
     currentPage: currentPage,
     pageSize: pageSize,
@@ -91,15 +92,12 @@ export default function QuizzDashboardClient() {
   };
 
   useEffect(() => {
-    let results = [...adminQuizzes];
+    let results = [...adminFixFixProblems];
 
     if (searchQuery.trim()) {
       const searchTerms = searchQuery.toLowerCase().trim();
-      results = results.filter(
-        (card) =>
-          card.question.toLowerCase().includes(searchTerms) ||
-          card.category.toLowerCase().includes(searchTerms) ||
-          card.topic.toLowerCase().includes(searchTerms),
+      results = results.filter((card) =>
+        card.question.toLowerCase().includes(searchTerms),
       );
     }
 
@@ -109,29 +107,23 @@ export default function QuizzDashboardClient() {
       );
     }
 
-    if (activeFilters.topic.length > 0) {
+    if (activeFilters.errorType.length > 0) {
       results = results.filter((card) =>
-        activeFilters.topic.includes(card.topic || ""),
+        activeFilters.errorType.includes(card.errorType || ""),
       );
     }
 
-    if (activeFilters.level.length > 0) {
-      results = results.filter((card) =>
-        activeFilters.level.includes(card.level || ""),
-      );
-    }
-
-    setFilteredQuizzes(results);
+    setFilteredFixProblems(results);
     setCurrentPage(1);
-  }, [adminQuizzes, searchQuery, activeFilters]);
+  }, [adminFixFixProblems, searchQuery, activeFilters]);
 
-  // Paginate filtered quizzes
-  const paginatedItems = filteredQuizzes.slice(
+  // Paginate filtered FixProblems
+  const paginatedItems = filteredFixProblems.slice(
     (paginationState.page - 1) * paginationState.pageSize,
     paginationState.page * paginationState.pageSize,
   );
 
-  const toggleFilter = (value: string, type: QuizzFilterType) => {
+  const toggleFilter = (value: string, type: FixProblemFilterType) => {
     setActiveFilters((prev) => {
       const updated = { ...prev };
       if (updated[type]?.includes(value)) {
@@ -146,7 +138,7 @@ export default function QuizzDashboardClient() {
   const clearFilters = () => {
     setActiveFilters(cardInitialFilters);
     setSearchQuery("");
-    setFilteredQuizzes(adminQuizzes);
+    setFilteredFixProblems(adminFixFixProblems);
     closeMenuFilters();
   };
 
@@ -157,32 +149,31 @@ export default function QuizzDashboardClient() {
   const handleRefresh = () => {
     setActiveFilters(cardInitialFilters);
     setSearchQuery("");
-    refetchQuizzes();
+    refetchFixProblems();
   };
 
   const handleExport = () => {
-    if (!filteredQuizzes.length) {
-      toast.info("Không có dữ liệu quiz để export");
+    if (!filteredFixProblems.length) {
+      toast.info("No data to export");
       return;
     }
 
-    const rows = filteredQuizzes.map((quiz) => ({
+    const rows = filteredFixProblems.map((quiz) => ({
       category: quiz.category,
-      topic: quiz.topic,
-      level: quiz.level,
       question: quiz.question,
-      option1: quiz.options?.[0] || "",
-      option2: quiz.options?.[1] || "",
-      option3: quiz.options?.[2] || "",
-      option4: quiz.options?.[3] || "",
+      errorType: quiz.errorType,
+      reason: quiz.reason,
       answer: quiz.answer,
-      explaining: quiz.explaining || "",
+      note: quiz.note,
     }));
 
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(rows);
-    XLSX.utils.book_append_sheet(wb, ws, "Quizzes");
-    XLSX.writeFile(wb, `quizzes_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    XLSX.utils.book_append_sheet(wb, ws, "FixProblems");
+    XLSX.writeFile(
+      wb,
+      `FixProblems_${new Date().toISOString().slice(0, 10)}.xlsx`,
+    );
   };
 
   const [openMenuFilters, setOpenMenuFilters] = useState(false);
@@ -190,31 +181,35 @@ export default function QuizzDashboardClient() {
 
   const [dialogKey, setDialogKey] = useState(0);
 
-  const [data, setData] = useState<IQuizz | null>(null);
+  const [data, setData] = useState<IFixProblem | null>(null);
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [cardToDelete, setQuizzToDelete] = useState<IQuizz | null>(null);
+  const [cardToDelete, setFixProblemToDelete] = useState<IFixProblem | null>(
+    null,
+  );
 
   // Import
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [isDraggingOnPage, setIsDraggingOnPage] = useState(false);
   const [droppedFile, setDroppedFile] = useState<File[] | null>(null);
 
-  const defaultQuizz: IQuizz = {
+  const defaultFixProblem: IFixProblem = {
     id: "",
     category: "",
-    topic: "",
-    level: "",
     question: "",
-    options: [],
-    answer: 0,
-    explaining: "",
+    errorType: EFixProblemErrorType.Vocabulary,
+    reason: "",
+    answer: EFixProblemAnswer.A,
+    note: "",
   };
 
-  const handleChange = (field: keyof IQuizz, value: IQuizz[keyof IQuizz]) => {
+  const handleChange = (
+    field: keyof IFixProblem,
+    value: IFixProblem[keyof IFixProblem],
+  ) => {
     setData((prev) => {
       if (!prev) {
-        return { ...defaultQuizz, [field]: value } as IQuizz;
+        return { ...defaultFixProblem, [field]: value } as IFixProblem;
       }
 
       return { ...prev, [field]: value };
@@ -224,7 +219,7 @@ export default function QuizzDashboardClient() {
   const handleUpdate = async () => {
     if (!data) return;
 
-    updateQuizzAsync(
+    updateFixProblemAsync(
       {
         cardId: data.id,
         data: data,
@@ -233,10 +228,10 @@ export default function QuizzDashboardClient() {
         onSuccess: (response) => {
           const card = response?.data?.card;
           if (card) {
-            updateInAdminQuizzes(card);
+            updateInAdminFixFixProblems(card);
           }
 
-          setIsUpdateQuizzOpen(false);
+          setIsUpdateFixProblemOpen(false);
         },
       },
     );
@@ -245,45 +240,50 @@ export default function QuizzDashboardClient() {
   const handleCreate = async () => {
     if (!data) return;
 
-    createQuizzAsync(data, {
+    createFixProblemAsync(data, {
       onSuccess: (response) => {
         const card = response?.data?.card;
         if (card) {
-          addToAdminQuizzes(card);
+          addToAdminFixFixProblems(card);
         }
 
-        setIsCreateQuizzOpen(false);
+        setIsCreateFixProblemOpen(false);
       },
     });
   };
 
-  const onDelete = (card: IQuizz) => {
-    setQuizzToDelete(card);
+  const onDelete = (card: IFixProblem) => {
+    setFixProblemToDelete(card);
     setDeleteDialogOpen(true);
   };
 
   const handleDialogClose = (open: boolean) => {
     if (!open) {
       setDeleteDialogOpen(false);
-      setQuizzToDelete(null);
+      setFixProblemToDelete(null);
     }
   };
 
   const handleDialogConfirm = async () => {
     if (!cardToDelete) return;
 
-    deleteQuizzAsync(cardToDelete.id, {
+    deleteFixProblemAsync(cardToDelete.id, {
       onSuccess: () => {
-        removeFromAdminQuizzes(cardToDelete.id);
+        removeFromAdminFixFixProblems(cardToDelete.id);
         setDeleteDialogOpen(false);
-        setQuizzToDelete(null);
+        setFixProblemToDelete(null);
       },
     });
   };
 
-  const onUpdate = async (card: IQuizz) => {
+  const onView = async (card: IFixProblem) => {
     setData(card);
-    setIsUpdateQuizzOpen(true);
+    setIsViewFixProblemOpen(true);
+  };
+
+  const onUpdate = async (card: IFixProblem) => {
+    setData(card);
+    setIsUpdateFixProblemOpen(true);
   };
 
   // Import handlers
@@ -292,7 +292,7 @@ export default function QuizzDashboardClient() {
       const form = new FormData();
       files.forEach((f) => form.append("file", f));
 
-      const res = await fetch("/api/quizzes/import", {
+      const res = await fetch("/api/FixProblems/import", {
         method: "POST",
         body: form,
       });
@@ -305,9 +305,9 @@ export default function QuizzDashboardClient() {
       }
 
       const { imported, errors, cards } = json.data;
-      (cards || []).forEach((c: any) => addToAdminQuizzes(c));
+      (cards || []).forEach((c: any) => addToAdminFixFixProblems(c));
       if (imported && Number(imported) > 0) {
-        toast.success(`Import thành công ${imported} quizzes!`);
+        toast.success(`Import thành công ${imported} FixProblems!`);
       }
 
       if (errors && errors.length > 0) {
@@ -319,7 +319,7 @@ export default function QuizzDashboardClient() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `quizzes_import_errors_${new Date().toISOString().slice(0, 10)}.txt`;
+        a.download = `FixProblemes_import_errors_${new Date().toISOString().slice(0, 10)}.txt`;
         document.body.appendChild(a);
         a.click();
         a.remove();
@@ -370,7 +370,7 @@ export default function QuizzDashboardClient() {
     }
   };
 
-  if (isLoadingQuizzes) {
+  if (isLoadingFixProblems) {
     return <TableDashboardSkeleton />;
   }
 
@@ -385,15 +385,15 @@ export default function QuizzDashboardClient() {
       {isDraggingOnPage && (
         <DraggingOnPage
           title="Thả file Excel vào đây"
-          subtitle="để import quizzes"
+          subtitle="để import FixProblems"
         />
       )}
 
       <DashboardHeader
         title="Quiz Dashboard"
         onCreateClick={() => {
-          setData(defaultQuizz);
-          setIsCreateQuizzOpen(true);
+          setData(defaultFixProblem);
+          setIsCreateFixProblemOpen(true);
         }}
         onImportClick={() => {
           setDroppedFile(null);
@@ -403,26 +403,26 @@ export default function QuizzDashboardClient() {
       />
 
       {/* Use consistent key to avoid hydration issues */}
-      <CreateQuizzDialog
-        key={`create-${dialogKey}-${isCreateQuizzOpen ? "open" : "closed"}`}
-        isOpen={isCreateQuizzOpen}
+      <CreateFixProblemDialog
+        key={`create-${dialogKey}-${isCreateFixProblemOpen ? "open" : "closed"}`}
+        isOpen={isCreateFixProblemOpen}
         onOpenChange={(open) => {
-          setIsCreateQuizzOpen(open);
+          setIsCreateFixProblemOpen(open);
           if (!open) {
             setData(null);
             setDialogKey((prev) => prev + 1);
           }
         }}
         onChange={handleChange}
-        onQuizzCreated={handleCreate}
+        onFixProblemCreated={handleCreate}
         data={data}
       />
 
-      <UpdateQuizzDialog
-        key={`update-${dialogKey}-${isUpdateQuizzOpen ? "open" : "closed"}`}
-        isOpen={isUpdateQuizzOpen}
+      <UpdateFixProblemDialog
+        key={`update-${dialogKey}-${isUpdateFixProblemOpen ? "open" : "closed"}`}
+        isOpen={isUpdateFixProblemOpen}
         onOpenChange={(open) => {
-          setIsUpdateQuizzOpen(open);
+          setIsUpdateFixProblemOpen(open);
           if (!open) {
             setData(null);
             setDialogKey((prev) => prev + 1);
@@ -430,7 +430,18 @@ export default function QuizzDashboardClient() {
         }}
         onChange={handleChange}
         data={data}
-        onQuizzUpdated={handleUpdate}
+        onFixProblemUpdated={handleUpdate}
+      />
+
+      <ViewFixProblemDialog
+        key={`view-${dialogKey}-${isViewFixProblemOpen ? "open" : "closed"}`}
+        isOpen={isViewFixProblemOpen}
+        onClose={() => {
+          setIsViewFixProblemOpen(false);
+          setData(null);
+          setDialogKey((prev) => prev + 1);
+        }}
+        data={data}
       />
 
       <div className="space-y-4">
@@ -443,7 +454,7 @@ export default function QuizzDashboardClient() {
                 <TableSearch
                   searchQuery={searchQuery}
                   setSearchQuery={setSearchQuery}
-                  placeholder="Search Quizzes..."
+                  placeholder="Search FixProblems..."
                 />
 
                 <Button
@@ -458,8 +469,8 @@ export default function QuizzDashboardClient() {
                   Refresh
                 </Button>
 
-                <QuizzFilter
-                  data={adminQuizzes}
+                <FixProblemFilter
+                  data={adminFixFixProblems}
                   openMenuFilters={openMenuFilters}
                   setOpenMenuFilters={setOpenMenuFilters}
                   activeFilters={activeFilters}
@@ -472,12 +483,13 @@ export default function QuizzDashboardClient() {
             </div>
           </CardHeader>
 
-          <QuizzTable
+          <FixProblemTable
             cards={paginatedItems}
             isLoading={false}
+            onView={onView}
             onUpdate={onUpdate}
             onDelete={onDelete}
-            showPagination={filteredQuizzes.length > 10}
+            showPagination={filteredFixProblems.length > 10}
             paginationData={paginationData}
             onPageChange={setPage}
           />
@@ -487,7 +499,7 @@ export default function QuizzDashboardClient() {
       <ConfirmationDialog
         open={deleteDialogOpen}
         onOpenChange={handleDialogClose}
-        title="Delete Quizz"
+        title="Delete FixProblem"
         description="This action cannot be undone. This will permanently delete the quiz and remove it from our servers."
         confirmText="Delete"
         cancelText="Cancel"
@@ -502,7 +514,7 @@ export default function QuizzDashboardClient() {
           if (!open) setDroppedFile(null);
         }}
         onImport={handleImport}
-        title="Import Quizzes"
+        title="Import FixProblems"
         // isLoading={isImporting}
         externalFiles={droppedFile ?? null}
       />

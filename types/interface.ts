@@ -1,3 +1,5 @@
+import { EFixProblemAnswer, EFixProblemErrorType } from "./enum";
+
 declare global {
     interface IPageable {
         page: number;
@@ -51,6 +53,16 @@ declare global {
         score: number
     }
 
+    interface IFixProblem {
+        id: string
+        category: string
+        question: string
+        errorType: EFixProblemErrorType
+        reason: string
+        answer: EFixProblemAnswer
+        note: string
+    }
+
     interface IQuizzResult {
         id: string
         quizzId: string
@@ -75,15 +87,6 @@ declare global {
         flashCardId: string
         isMemorized: boolean
         updatedAt: string
-    }
-
-    interface IDashboardStats {
-        totalQuestions: number
-        correctAnswers: number
-        wrongAnswers: number
-        totalWord: number
-        memorizedWord: number
-        unmemorizedWord: number
     }
 }
 
